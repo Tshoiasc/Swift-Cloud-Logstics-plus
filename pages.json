@@ -1,0 +1,445 @@
+{
+	"pages": [{
+			"path": "pages/list/list",
+			"style": {
+				// #ifndef APP-PLUS
+				"navigationBarBackgroundColor": "#feaf62",
+				"backgroundColorTop": "#feaf62",
+				"navigationBarTextStyle": "white",
+				// #endif
+				// #ifdef APP-PLUS
+				"app-plus": {
+					"titleNView": false,
+					"renderer": "native", //App端纯原生渲染模式
+					"scrollIndicator": false
+				},
+				// #endif
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "云极速递+",
+				"backgroundColor": "#f7f7f7"
+			}
+		}, {
+			"path": "pages/order/order",
+			"style": {
+				// #ifdef APP-PLUS
+				"app-plus": {
+					"pullToRefresh": {
+						"support": false
+					},
+					"titleNView": false,
+					"bounce": false,
+					"renderer": "native" //App端纯原生渲染模式
+				},
+				// #endif
+				"backgroundColor": "#f7f7f7",
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		// #ifdef APP-PLUS
+		{
+			"path": "pages/app/app",
+			"style": {
+				"navigationBarTitleText": "工作台",
+				"app-plus": {
+					"background": "#f7f7f7",
+					"titleNView": {
+						"type": "float",
+						"backgroundColor": "",
+						"subtitleText": "太阳路25号菜鸟驿站-站长",
+						"subtitleColor": "#999",
+						"blurEffect": "extralight",
+						"buttons": [{
+							"float": "right",
+							"text": "切换组织",
+							"fontSize": "12",
+							"color": "#555",
+							"select": true,
+							"width": "auto"
+						}]
+					},
+					"subNVues": [{
+						"id": "app_popup", // 唯一标识  
+						"path": "pages/app/pop_up", // 页面路径  
+						"type": "popup",
+						"style": {
+							"position": "absolute",
+							"dock": "bottom",
+							"top": "30%",
+							"bottom": "0",
+							"right": "0",
+							"left": "0",
+							"background": "transparent",
+							"mask": "none",
+							"backButtonAutoControl": "none"
+						}
+					}],
+					"scrollIndicator": "none"
+				}
+			}
+		},
+		// #endif
+		{
+			"path": "pages/grid/grid",
+			"style": {
+				//#ifndef MP
+				"navigationStyle": "custom"
+				//#endif
+			}
+		}, {
+			"path": "pages/ucenter/login-page/index/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"app-plus": {
+					"animationType": "none",
+					"popGesture": "none"
+				}
+			}
+		}, {
+			"path": "pages/list/search/search",
+			"style": {
+				"navigationBarTitleText": "搜索"
+			}
+		}, {
+			"path": "pages/list/detail",
+			"style": {
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "share"
+						}],
+						"type": "transparent"
+					}
+				},
+				"h5": {
+					"titleNView": {
+						"type": "transparent"
+					}
+				},
+				"navigationBarTitleText": "文章详情"
+			}
+		}, {
+			"path": "pages/ucenter/userinfo/bind-mobile/bind-mobile",
+			"style": {
+				"navigationBarTitleText": "绑定手机号码"
+			}
+		},
+		{
+			"path": "pages/ucenter/ucenter",
+			"style": {
+				"backgroundColor": "#f7f7f7",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black"
+					//#ifdef APP-PLUS
+					,
+				"app-plus": {
+					"background": "#f7f7f7",
+					"scrollIndicator": "none"
+					// ,
+					
+					// "titleNView": {
+					// 	"type": "transparent",
+					// 	"titleText": "二十三",
+					// 	"titleAlign": "left",
+					// 	"titleIcon": "../../static/app-plus/sharemenu/copyurl.png",
+					// 	"blurEffect":"extralight"
+					// }
+				}
+				//#endif
+			}
+		}, {
+			"path": "pages/ucenter/about/about",
+			"style": {
+				"navigationBarTitleText": "关于",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#5677FC"
+					// #ifdef APP-PLUS
+					,
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "share"
+						}]
+					}
+				}
+				// #endif
+			}
+
+		}, {
+			"path": "uni_modules/uni-upgrade-center-app/pages/upgrade-popup",
+			"style": {
+				"disableScroll": true,
+				"app-plus": {
+					"backgroundColorTop": "transparent",
+					"background": "transparent",
+					"titleNView": false,
+					"scrollIndicator": false,
+					"popGesture": "none",
+					"animationType": "fade-in",
+					"animationDuration": 200
+
+				}
+			}
+		}, {
+			"path": "pages/app/apps/pushInStore/pushInStore",
+			"style": {
+				"navigationBarTitleText": "入库管理",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"subNVues": [{
+						"id": "sub_nfc", // 唯一标识  
+						"path": "pages/app/apps/pushInStore/sub_nfc", // 页面路径  
+						"type": "popup",
+						"style": {
+							"position": "absolute",
+							"dock": "bottom",
+							"top": "750rpx",
+							"bottom": "0",
+							"right": "8rpx",
+							"left": "8rpx",
+							"background": "transparent",
+							// "mask": "none",
+							"backButtonAutoControl": "none"
+						}
+					}]
+				}
+
+			}
+
+		}, {
+			"path": "pages/uni-agree/uni-agree",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"popGesture": "none"
+				}
+			}
+		}, {
+			"path": "pages/ucenter/settings/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+
+		}, {
+			"path": "pages/ucenter/userinfo/userinfo",
+			"style": {
+				"navigationBarTitleText": "个人资料"
+			}
+		}, {
+			"path": "pages/ucenter/userinfo/cropImage",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/ucenter/login-page/pwd-login/pwd-login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/ucenter/login-page/pwd-retrieve/pwd-retrieve",
+			"style": {
+				"navigationBarTitleText": "重置密码"
+			}
+		}, {
+			"path": "pages/ucenter/login-page/phone-code/phone-code",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+
+		}, {
+			"path": "pages/common/webview/webview",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/ucenter/login-page/register/register",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/ucenter/read-news-log/read-news-log",
+			"style": {
+				"navigationBarTitleText": "阅读记录",
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/ucenter/invite/invite",
+			"style": {
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/ucenter/settings/deactivate/deactivate",
+			"style": {
+				"navigationBarTitleText": "注销提醒",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback",
+			"style": {
+				"navigationBarTitleText": "意见反馈",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "pages/list/userPages/submitOrder/submitOrder",
+			"style": {
+				"navigationBarTitleText": "寄快递",
+				"navigationBarTextStyle": "black",
+				"enablePullDownRefresh": false,
+				"backgroundColor": "#f7f7f7",
+				"app-plus": {
+					"background": "#f7f7f7"
+				}
+			}
+
+		}, {
+			"path": "pages/list/userPages/offenAddress/offenAddress",
+			"style": {
+				"navigationBarTitleText": "地址簿",
+				"enablePullDownRefresh": false,
+				"backgroundColor": "#f7f7f7",
+				"navigationBarBackgroundColor": "#f7f7f7",
+				"navigationBarTextStyle": "black",
+				"app-plus": {
+					"background": "#f7f7f7",
+					"color": "#333",
+					"titleNView": {
+						// "type": "float",
+						// "backgroundColor": "",
+						// "subtitleText": "太阳路25号菜鸟驿站-站长",
+						// "subtitleColor": "#999",
+						// "blurEffect": "extralight",
+						"buttons": [{
+							"float": "right",
+							"text": "添加",
+							"fontSize": "16",
+							"color": "#555",
+							"width": "auto"
+						}]
+					}
+				}
+			}
+
+		}, {
+			"path": "pages/list/userPages/itemInfo/itemInfo",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}
+
+	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"tui-(.*)": "@/components/thorui/tui-$1/tui-$1.vue",
+			"^u-(.*)": "@/uni_modules/uview-ui/components/u-$1/u-$1.vue"
+		}
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-starter",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#fafafa",
+		"enablePullDownRefresh": false
+	},
+	"condition": {
+		"list": [{
+				"path": "pages/list/detail"
+			}, {
+				"path": "pages/list/list"
+			},
+			{
+				"path": "pages/ucenter/login-page/index/index"
+			}, {
+				"path": "pages/ucenter/userinfo/userinfo"
+			},
+			{
+				"path": "pages/ucenter/settings/settings"
+			}
+		],
+		"current": 1
+	},
+
+	"tabBar": {
+		"color": "#666666"
+
+			// #ifndef APP-PLUS
+			,
+		"selectedColor": "#fd8631"
+			// #endif
+			// #ifdef APP-PLUS
+			,
+		"selectedColor": "#3d69f9",
+		"borderStyle": "#eeeeee",
+		"blurEffect": "extralight",
+		"spacing": "5px",
+		"height": "50px"
+			// #endif
+			,
+
+
+		"list": [{
+				"pagePath": "pages/list/list",
+				"text": "首页",
+				"iconPath": "static/images/tabbar/home.png"
+					// #ifdef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/home-fill-app.png"
+					// #endif
+					// #ifndef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/home-fill.png"
+				// #endif
+			},
+			{
+				"pagePath": "pages/order/order",
+				"text": "订单",
+				"iconPath": "static/images/tabbar/order-empty.png"
+
+					// #ifdef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/order-fill-app.png"
+					// #endif
+					// #ifndef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/order-fill.png"
+				// #endif
+
+
+
+			},
+			// #ifdef APP-PLUS
+			{
+				"pagePath": "pages/app/app",
+				"text": "工作台",
+				"iconPath": "static/images/tabbar/app.png",
+				"selectedIconPath": "static/images/tabbar/app-fill-app.png"
+			},
+			// #endif
+			{
+				"pagePath": "pages/ucenter/ucenter",
+				"text": "我",
+				"iconPath": "static/images/tabbar/user.png"
+					// #ifdef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/user-fill-app.png"
+					// #endif
+					// #ifndef APP-PLUS
+					,
+				"selectedIconPath": "static/images/tabbar/user-fill.png"
+				// #endif
+
+			}
+		]
+
+	}
+}

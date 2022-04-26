@@ -1,0 +1,243 @@
+<template>
+	<page-meta style="background-color: #f7f7f7;overflow: hidden;" background-color="#f7f7f7">
+
+	</page-meta>
+	<view style="position: relative;background-color: #f7f7f7;">
+		<view id="header"
+			style="background-color: #f7f7f7;position: sticky;padding-top:var(--status-bar-height);left: 0;right: 0;z-index: 999999;">
+			<tui-notice-bar is-left color="#f54f46" :content="content" :padding="['6rpx','10rpx','6rpx','20rpx']"
+				size="26">
+				<template v-slot:left>
+					<view class="tui-padding">
+						<tui-icon name="news-fill" :size="48" unit="rpx" color="#f54f46"></tui-icon>
+					</view>
+				</template>
+			</tui-notice-bar>
+			<view class="searchbar"
+				style="padding: 0 24rpx;height: 48px;display: flex;align-items: center;justify-content: center;">
+				<u-search placeholder="输入订单号/关键字搜索" :animation="true"></u-search>
+			</view>
+			<view class="tabs" @click="swiperChange">
+				<view class="tab" v-for="(tab,index) in tabs" :key="index">
+					<text class="tab_title">{{tab.title}}</text>
+				</view>
+				<view class="span" id="span"></view>
+			</view>
+		</view>
+		<view class="pad" :style="{height:header.height+'px'}"></view>
+		<swiper :indicator-dots="false" :autoplay="false" @transition="swiperChange" @change="animationFinish"
+			@animationfinish="animationFinish" :circular="false"
+			:style="{height:(systeminfo.windowHeight - header.height) +'px',width:'750rpx'}" :duration="300">
+			<swiper-item v-for="(tab,index) in tabs"
+				:style="{height:(systeminfo.windowHeight - header.height) +'px',width:'750rpx'}">
+				<list switch="type" :style="{height:(systeminfo.windowHeight - header.height) +'px',width:'750rpx'}">
+					<cell v-for="(item, i) in [1,2,3,3,3,3,3,3,3]">
+						<orderCard style="margin: 12rpx 0;"></orderCard>
+					</cell>
+				</list>
+			</swiper-item>
+		</swiper>
+		<!-- </view> -->
+	</view>
+
+</template>
+<script>
+	import orderCard from './orderCard.nvue'
+	export default {
+		components: {
+			orderCard
+		},
+		data() {
+			return {
+				content: "您的快递丢失了！",
+				systeminfo: {},
+				avatarList: [{
+					url: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
+				}, {
+					url: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
+				}, {
+					url: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png'
+				}],
+				newsid: 1,
+				tabs: [{
+					title: "我寄件"
+				}, {
+					title: "我收件"
+				}, {
+					title: "待支付"
+				}, {
+					title: "我退款"
+				}],
+				header: {}
+			}
+		},
+		onShow() {
+			plus.navigator.setStatusBarStyle("dark")
+			let that = this
+			if (!this.systeminfo.statusBarHeight)
+				this.systeminfo = uni.getSystemInfoSync()
+			if (!this.header.height) {
+				setTimeout(() => {
+					uni.createSelectorQuery().select('#header').boundingClientRect(rect => {
+						console.log(rect)
+						that.header = rect
+						console.log(that.header)
+					}).exec()
+				}, 300)
+			}
+
+
+		},
+		methods: {}
+	}
+</script>
+
+<!-- 
+<script lang="renderjs" module="active">
+	import {
+		mapGetters,
+		mapMutations
+	} from 'vuex';
+	import newsPage from '../news-page.nvue';
+	let systemInfo
+	let span;
+	let current = 0
+	let tabs = []
+	let tabs_pos = []
+	let not_do = false;
+	export default {
+		components: {
+			newsPage
+		},
+		computed: {
+			...mapGetters({
+				systemInfo: 'user/systemInfo'
+			})
+		},
+		mounted() {
+			span = document.getElementById("span")
+			tabs = document.getElementsByClassName('tab_title')
+			for (let i = 0; i < tabs.length; i++) {
+				let bounding = tabs[i].getBoundingClientRect()
+				tabs_pos.push(bounding)
+			}
+			systemInfo = uni.getSystemInfoSync()
+			span.style.width = `${tabs_pos[0].width}px`
+			span.style.left = `${tabs_pos[0].x}px`
+			tabs[0].style.opacity = 1
+			tabs[0].style['font-weight'] = 900
+		},
+		methods: {
+			swiperChange(e, ins) {
+				let instance = span;
+				let direction = e.detail.dx > 0 ? 1 : -1
+				let nextIndex = current + direction
+				if (nextIndex > tabs_pos.length - 1 || nextIndex < 0) return;
+				e.detail.dx = e.detail.dx % (systemInfo.screenWidth * 4)
+				let move_index = 0;
+				for (let i = current;; i += direction) {
+					if (i < 0 || i >= tabs_pos.length) break;
+					if (Math.abs(e.detail.dx / 4) >= Math.abs(tabs_pos[i].x - tabs_pos[current].x)) {
+						move_index++
+					} else {
+						break;
+					}
+				}
+				let real_nextIndex = current + direction * move_index
+				let around_index = real_nextIndex - direction
+				let move_param = tabs_pos[current].x + e.detail.dx / 4
+				let flag = 1
+				if (real_nextIndex < 0) {
+					real_nextIndex = tabs_pos.length - 1
+					around_index = 0
+				} else if (real_nextIndex >= tabs_pos.length) {
+
+					real_nextIndex = 0
+					around_index = tabs_pos.length - 1
+				} else {
+				}
+				instance.style.left = move_param + 'px'
+				let dis_two = Math.abs(tabs_pos[real_nextIndex].x - tabs_pos[around_index].x)
+				let real_nextIndex_param = Math.abs((tabs_pos[current].x + e.detail.dx * flag / 4 - tabs_pos[
+					real_nextIndex].x) / dis_two)
+				let last_real_param = Math.abs((tabs_pos[current].x + e.detail.dx * flag / 4 - tabs_pos[around_index].x) /
+					dis_two)
+				if (real_nextIndex_param > 1) real_nextIndex_param = 1
+				else if (real_nextIndex_param < 0) real_nextIndex_param = 0
+				if (last_real_param > 1) last_real_param = 1
+				else if (last_real_param < 0) last_real_param = 0
+				for (let i = 0; i < tabs_pos.length; i++) {
+					if (i == real_nextIndex) {
+						tabs[i].style['font-weight'] = 1000 - (Math.ceil(real_nextIndex_param * 6) * 100)
+						tabs[i].style.opacity = 1 - real_nextIndex_param * 0.6
+					} else if (i == around_index) {
+						tabs[i].style['font-weight'] = 1000 - (Math.ceil(last_real_param * 6) * 100)
+						tabs[i].style.opacity = 1 - last_real_param * 0.6
+					} else {
+						tabs[i].style['font-weight'] = 400
+						tabs[i].style.opacity = 0.4
+					}
+				}
+			},
+			animationFinish(e, ins) {
+				if (e.type == 'animationfinish') {
+					current = e.detail.current
+
+				}
+			},
+		}
+	}
+</script>
+
+ -->
+<style lang="scss" scoped>
+	.tui-padding {
+		display: flex;
+		align-items: center;
+		padding: 0 12rpx;
+	}
+
+	.pad {
+		background-color: #f7f7f7;
+	}
+
+	.list {
+		padding-bottom: 24rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+
+	.tabs {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		// padding: 0 0 24rpx 0;
+		height: 42px;
+
+		.tab {
+
+			text-align: center;
+			width: 25%;
+
+			.tab_title {
+				opacity: .4;
+				font-weight: 400;
+			}
+		}
+
+		.span {
+			position: absolute;
+			height: 4px;
+			border-radius: 4rpx;
+			background-color: #5483ee;
+			bottom: 0;
+			width: 25%;
+			left: 0;
+			transition: all;
+		}
+	}
+</style>

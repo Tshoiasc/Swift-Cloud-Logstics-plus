@@ -1,0 +1,286 @@
+{
+    "name" : "express_nfc",
+    "appid" : "__UNI__F70C244",
+    "description" : "基于RFID实现物流管理的一体化解决方案",
+    "versionName" : "1.0.2",
+    "versionCode" : 102,
+    "transformPx" : false,
+    "app-plus" : {
+        "safearea" : {
+            "bottom" : {
+                "offset" : "none"
+            }
+        },
+        "compilerVersion" : 3,
+        "locales" : {
+            "en" : {
+                "name" : "uni-starter",
+                "android" : {
+                    "strings" : {
+                        "CustomKey" : "CustomValue"
+                    }
+                },
+                "ios" : {
+                    "privacyDescription" : {
+                        "NSPhotoLibraryUsageDescription" : "access to the user’s photo library(read)"
+                    },
+                    "infoPlist" : {
+                        "CustomKey" : "CustomValue"
+                    }
+                }
+            },
+            "zh" : {
+                "name" : "云极速递+"
+            }
+        },
+        "privacy" : {
+            "prompt" : "template",
+            "template" : {
+                "title" : "服务协议和隐私政策",
+                "message" : "　　请你务必审慎阅读、充分理解“服务协议”和“隐私政策”各条款，包括但不限于：为了更好的向你提供服务，我们需要收集你的设备标识、操作日志等信息用于分析、优化应用性能。<br/>　　你可阅读<a href=\"https://ask.dcloud.net.cn/protocol.html\">《服务协议》</a>和<a href=\"https://ask.dcloud.net.cn/protocol.html\">《隐私政策》</a>了解详细信息。如果你同意，请点击下面按钮开始接受我们的服务。",
+                "buttonAccept" : "同意",
+                "buttonRefuse" : "暂不同意"
+            }
+        },
+        "compatible" : {
+            "ignoreVersion" : true
+        },
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {
+            "Fingerprint" : {},
+            "FaceID" : {},
+            "Geolocation" : {},
+            "Bluetooth" : {},
+            "Push" : {},
+            "Webview-x5" : {},
+            "VideoPlayer" : {},
+            "Maps" : {},
+            "OAuth" : {}
+        },
+        "distribute" : {
+            "android" : {
+                "permissions" : [
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.AUTHENTICATE_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.NFC\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.USE_FINGERPRINT\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ],
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ]
+            },
+            "ios" : {
+                "capabilities" : {
+                    "entitlements" : {
+                        "com.apple.developer.associated-domains" : [ "applinks:static-76ce2c5e-31c7-4d81-8fcf-ed1541ecbc6e.bspapp.com" ]
+                    }
+                },
+                "privacyDescription" : {
+                    "NFCReaderUsageDescription" : "申请使用NFC功能",
+                    "NSUserTrackingUsageDescription" : "申请跟踪功能"
+                }
+            },
+            "sdkConfigs" : {
+                "oauth" : {},
+                "ad" : {},
+                "share" : {
+                    "weixin" : {
+                        "appid" : "",
+                        "UniversalLinks" : ""
+                    }
+                },
+                "geolocation" : {
+                    "amap" : {
+                        "__platform__" : [ "ios", "android" ],
+                        "appkey_ios" : "110e39a865a3265432853b47f8f7a576",
+                        "appkey_android" : "ccbe5c19ff124f7b7fc9af59c674c5a1"
+                    }
+                },
+                "push" : {
+                    "igexin" : {
+                        "appid" : "123",
+                        "appkey" : "123",
+                        "appsecret" : "123"
+                    }
+                },
+                "payment" : {},
+                "maps" : {
+                    "amap" : {
+                        "appkey_ios" : "110e39a865a3265432853b47f8f7a576",
+                        "appkey_android" : "ccbe5c19ff124f7b7fc9af59c674c5a1"
+                    }
+                }
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
+                }
+            },
+            "splashscreen" : {
+                "alwaysShowBeforeRender" : false,
+                "waiting" : false,
+                //"autoclose" : true,
+                "autoclose" : false,
+                "delay" : 0,
+                "iosStyle" : "common",
+                "androidStyle" : "default",
+                "useOriginalMsgbox" : true,
+                "android" : {
+                    "hdpi" : "/Users/tshoiasc/Downloads/云极速递480762.png",
+                    "xhdpi" : "/Users/tshoiasc/Downloads/云极速递480762 (1).png",
+                    "xxhdpi" : "/Users/tshoiasc/Downloads/dclogo.png"
+                }
+            }
+        },
+        "nvueLaunchMode" : "",
+        "uniStatistics" : {
+            "enable" : true
+        },
+        "nativePlugins" : {
+            "Am-NFCReaderIDUniPlugin" : {
+                "__plugin_info__" : {
+                    "name" : "NFCReaderIDUniPlugin - [试用版，仅用于自定义调试基座]",
+                    "description" : "iOS版，读取NFC芯片ID的插件",
+                    "platforms" : "iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=7401",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : true,
+                    "bought" : 0,
+                    "pid" : "7401",
+                    "parameters" : {}
+                }
+            },
+            "GLLNFCUniPlugin-Helper" : {
+                "__plugin_info__" : {
+                    "name" : "GLLNFCUniPlugin - [试用版，仅用于自定义调试基座]",
+                    "description" : "用于iOS NFC标签数据交互",
+                    "platforms" : "iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=4666",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : true,
+                    "bought" : 0,
+                    "pid" : "4666",
+                    "parameters" : {}
+                }
+            },
+            "yzy-YzyNfcTagRead" : {
+                "__plugin_info__" : {
+                    "name" : "NFCTagReader - [试用版，仅用于自定义调试基座]",
+                    "description" : "使用iOS原生的nfctag标签读取",
+                    "platforms" : "iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=3545",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : true,
+                    "bought" : 0,
+                    "pid" : "3545",
+                    "parameters" : {}
+                }
+            }
+        }
+    },
+    "quickapp" : {},
+    "mp-weixin" : {
+        "appid" : "wx857b93288316297e",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true,
+            "minified" : true,
+            "postcss" : false
+        },
+        "usingComponents" : true,
+        "betterScopedSlots" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "云极速递想获取您的地理位置"
+            }
+        },
+        "uniStatistics" : {
+            "enable" : true
+        }
+    },
+    "mp-alipay" : {
+        "usingComponents" : true
+    },
+    "mp-baidu" : {
+        "usingComponents" : true
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true
+    },
+    "uniStatistics" : {
+        "enable" : false
+    },
+    "h5" : {
+        "template" : "",
+        "sdkConfigs" : {
+            "maps" : {}
+        },
+        "router" : {
+            "base" : ""
+        },
+        "uniStatistics" : {
+            "enable" : false
+        },
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : true
+            }
+        },
+        "title" : "云极速递+"
+    },
+    "_spaceID" : "",
+    "vueVersion" : "2"
+}

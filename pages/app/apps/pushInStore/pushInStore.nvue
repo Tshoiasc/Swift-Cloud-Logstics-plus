@@ -1,0 +1,355 @@
+<template>
+	<view style="width:750rpx;align-items: center;display: flex;justify-content: center;">
+		<view class="head" style="position: fixed;top: 0;left: 0;right: 0;align-items: center;">
+			<!-- 		<u-subsection :list="list" mode="button" :current="current" @change="sectionChange"
+				style="width: 620rpx;margin-top: 24rpx;" inactiveColor="#fff" bgColor="#a4c5ed">
+			</u-subsection> -->
+			<tui-segmented-control style="width: 620rpx;margin-top: 24rpx;" :values="seg.map(a=>a.title)"
+				@click="sectionChange" :current="current">
+			</tui-segmented-control>
+
+		</view>
+
+
+		<list style="margin-top: 94rpx;" v-if="list[current == 1 ? 'no' : 'yes'].count > 0">
+
+			<cell v-for="item in list[current == 1? 'no': 'yes'].list">
+				<orderCard :data="item" :staff="true" @onClick="onClickUp(item)"
+					style="margin: 24rpx 0;height: 320rpx;"></orderCard>
+			</cell>
+		</list>
+		<view class="" v-else>
+			<u-empty style="margin-top: 120rpx;" mode="order" textSize="16" width="180" height="180"
+				icon="http://cdn.uviewui.com/uview/empty/order.png">
+			</u-empty>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		request
+	} from '@/common/request'
+	import tuiSegmentedControl from "@/components/thorui/tui-segmented-control/tui-segmented-control"
+	import orderCard from '@/pages/order/order_app/orderCard';
+	// var nfcModule = uni.requireNativePlugin("Am-NFCReaderIDUniPlugin-TestModule")
+	var nfcModule = uni.requireNativePlugin("yzy-YzyNfcTagRead")
+	// const nfcModule = uni.requireNativePlugin("yzy-YzyNfcTagRead")
+	import android_nfc from './android_nfc.js';
+	var NfcAdapter;
+	var NdefRecord;
+	var NdefMessage;
+	var waiting;
+	var readyRead = false;
+	var nfcAdapter, main, pendingIntent, intentFiltersArray, techListsArray, IntentFilter;
+	export default {
+		components: {
+			orderCard,
+			tuiSegmentedControl
+		},
+		data() {
+			return {
+				currentNFCInfo: [], //NFC 读取消息；
+				bannerShow: false,
+				remark: '',
+				message: '',
+				count: 0,
+				timestampHide: '',
+				timestampShow: '',
+				scrollTop: 0,
+				subNVue: {},
+				seg: [{
+					title: '已入库(0)',
+					type: "yes"
+				}, {
+					title: '待入库(0)',
+					type: "no"
+				}],
+				current: 1,
+				systemInfo: {},
+				list: {
+					no: {
+						list: [],
+						current: -1,
+						init: false
+					},
+					yes: {
+						list: [],
+						current: -1,
+						init: false
+					}
+				}
+			}
+		},
+		onLoad() {
+			this.current = 1
+			this.getData('no').then(res => {
+				console.log("no", res)
+				if (res.code) {
+					uni.showToast({
+						title: res.msg,
+						icon: "none"
+					})
+					return;
+				}
+				this.seg[1].title = `待入库(${res.data.count})`
+				this.list["no"] = {
+					...res.data,
+					init: true
+				}
+			})
+			this.getData('yes').then(res => {
+				console.log("yes", res)
+				if (res.code) {
+					uni.showToast({
+						title: res.msg,
+						icon: "none"
+					})
+					return;
+				}
+				this.seg[0].title = `已入库(${res.data.count})`
+				this.list["yes"] = {
+					...res.data,
+					init: true
+				}
+			})
+		},
+		onReady() {
+			this.systemInfo = uni.getSystemInfoSync();
+			if (this.systemInfo.platform == 'ios') {
+				return;
+			}
+			const subNVue = uni.getSubNVueById('sub_nfc')
+			// this.listenNFCStatus();
+			uni.$on("sub_nfc_show", (e) => {
+				if (e.show) {
+
+				} else {
+					try {
+						android_nfc.removeListener()
+					} catch (e) {
+
+					}
+				}
+			})
+		},
+		methods: {
+			njsAlertForiOS() {
+				// 导入UIAlertView类
+				var UIAlertView = plus.ios.importClass("UIAlertView");
+				// 创建UIAlertView类的实例对象
+				var view = new UIAlertView();
+				// 设置提示对话上的内容
+				view.initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("自定义标题" // 提示框标题
+					, "使用NJS的原生弹出框，可自定义弹出框的标题、按钮" // 提示框上显示的内容
+					, null // 操作提示框后的通知代理对象，暂不设置
+					, "确定(或者其他字符)" // 提示框上取消按钮的文字
+					, null); // 提示框上其它按钮的文字，设置为null表示不显示
+				// 调用show方法显示提示对话框，在JS中使用()语法调用对象的方法
+				view.show();
+			},
+			async getData(type) {
+				let current = this.list[type].current + 1
+
+				const res = await request('orders', 'staffListOrders', {
+					current: current,
+					page: 20,
+					exist: type == 'yes' ? true : false
+				});
+				return res
+				// const res = await request('orders', 'staffListOrders',{
+				// 	type:
+				// });
+				// if (res.code) {
+				// 	uni.showToast({
+				// 		title: res.msg,
+				// 		icon: "none"
+				// 	})
+				// } else {
+				// 	return 
+				// 	this.no_list = res.data.no.data
+				// 	this.yes_list = res.data.yes.data
+				// 	this.seg = [`已入库(${this.yes_list.length})`, `待入库(${this.no_list.length})`]
+				// }
+			},
+			read(e) {
+
+				let that = this
+				nfcModule.TagNfcReadAsyncFunc({
+					'name': 'yzyzuishuai'
+				}, (res) => {
+					console.log(res)
+					// console.log(res)
+					if (res.type != 1) {
+						plus.nativeUI.alert(res.msg, () => {
+							2
+						}, "提示", "确定")
+						return;
+					}
+					// uni.showLoading({
+					// 	title: "读取成功,正在上传。"
+					// })
+					if (e.bind_card) {
+						if (e.bind_card == res.msg) {
+							plus.nativeUI.alert("核验通过", () => {
+
+							}, "提示", "确定")
+							// var msg = "hhaha" + '：' + "121212";
+							// var payload = '{"pagePath":"/pages/chat/chat?chatid=' + '12' + '&frms=localpush"}';
+							// plus.push.createMessage(msg, payload, {
+							// 	title: '微聊',
+							// 	cover: false
+							// });
+							// uni.showToast({
+							// 	title: "核验通过"
+							// })
+						} else {
+							plus.nativeUI.alert("核验不通过", () => {
+
+							}, "警告", "确定")
+							// uni.showToast({
+							// 	title: "核验未通过",
+							// 	icon: "error"
+							// })
+						}
+					} else {
+						this.bindCard(e._id, res.msg).then(res => {
+							if (res.code) {
+								plus.nativeUI.alert(res.msg, () => {
+
+								}, "提示", "确定")
+								return;
+							}
+							plus.nativeUI.alert("绑定成功", () => {
+
+							}, "提示", "确定")
+							that.refresh()
+						})
+					}
+
+				})
+			},
+			refresh() {
+				this.current = 1
+				this.list["yes"].current = -1
+				this.list["no"].current = -1
+				this.getData('no').then(res => {
+					console.log("no", res)
+					if (res.code) {
+						uni.showToast({
+							title: res.msg,
+							icon: "none"
+						})
+						return;
+					}
+					this.seg[1].title = `待入库(${res.data.count})`
+					this.list["no"] = {
+						...res.data,
+						init: true
+					}
+				})
+				this.getData('yes').then(res => {
+					console.log("yes", res)
+					if (res.code) {
+						uni.showToast({
+							title: res.msg,
+							icon: "none"
+						})
+						return;
+					}
+					this.seg[0].title = `已入库(${res.data.count})`
+					this.list["yes"] = {
+						...res.data,
+						init: true
+					}
+					console.log(this.list)
+				})
+			},
+			async bindCard(order_id, card_id) {
+				const res = await request('orders', 'staffBindCard', {
+					order_id,
+					card_id
+				});
+				return res
+			},
+			onClickUp(e) {
+				let that = this
+				if (this.systemInfo.platform == 'ios') {
+					this.read(e)
+				} else {
+					const subNVue = uni.getSubNVueById('sub_nfc')
+
+					subNVue.show('slide-in-bottom', 300, function() {
+						uni.$emit("sub_nfc_show", {
+							show: true
+						})
+						android_nfc.listenNFCStatus(res => {
+							console.log(res)
+							if (res.type == 'start') {
+								uni.showLoading({
+									title: "读取中"
+								})
+							} else if (res.type == 'end') {
+								uni.hideLoading()
+
+								if (!res.result.techlist.includes("NfcV")) {
+									plus.nativeUI.alert("卡片格式错误", () => {
+
+									}, "警告", "确定")
+
+								} else {
+									// uni.showToast({
+									// 	title: "成功：" + res.result.tagId,
+									// 	icon: "none"
+									// })
+									console.log(e)
+									if (e.bind_card) {
+										if (e.bind_card == res.result.tagId) {
+
+											plus.nativeUI.alert("核验通过", () => {
+
+											}, "提示", "确定")
+
+										} else {
+											plus.nativeUI.alert("核验未通过", () => {
+
+											}, "警告", "确定")
+										}
+									} else {
+										uni.showLoading({
+											title: "读取成功,正在上传。"
+										})
+										console.log(res)
+										that.bindCard(e._id, res.result.tagId).then(res => {
+											if (res.code) {
+												plus.nativeUI.alert(res.msg, () => {
+
+												}, "提示", "确定")
+												return;
+											}
+											plus.nativeUI.alert("绑定成功", () => {
+
+											}, "提示", "确定")
+											that.refresh()
+										})
+									}
+								}
+								subNVue.hide("slide-out-bottom", 300)
+							}
+
+						})
+					});
+				}
+
+			},
+			sectionChange(index) {
+				console.log(index)
+				this.current = index.index;
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

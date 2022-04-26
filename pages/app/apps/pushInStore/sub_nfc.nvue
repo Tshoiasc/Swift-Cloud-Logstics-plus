@@ -1,0 +1,200 @@
+<template>
+	<view class="page">
+		<view class="card">
+			<text class="title">
+				已准备好扫描
+			</text>
+			<view class="circle">
+				<view class="inner" ref="phone">
+					<image class="image" id="image" v-if="imageshow"
+						src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/iPhone%20X%20(133).png?sign=38147c763e4f01fc634d2bbe24912dcd&t=1650797659"
+						mode="heightFix"></image>
+				</view>
+
+				<view class="white">
+					<view class="white-circle">
+
+					</view>
+				</view>
+
+				<!-- 
+				<view class="bu" v-if="systemInfo.platform != 'ios'"
+					style="position: absolute;background-color: #5184fa;height: 28rpx;width:154rpx;bottom: 9rpx;border-radius: 0 0 100rpx 100rpx;">
+
+				</view> -->
+			</view>
+
+			<text class=" subtitle">请将包裹绑定卡靠近手机</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	const Binding = uni.requireNativePlugin('bindingx');
+	export default {
+		data() {
+			return {
+				phone_bind: {},
+				imageshow: true
+			}
+		},
+		onLoad() {
+			this.systemInfo = uni.getSystemInfoSync()
+			let that = this;
+			uni.getCurrentSubNVue().addEventListener("show", function() {
+				uni.$emit("sub_nfc_show", {
+					show: true
+				})
+				that.setBindingX()
+			});
+			uni.getCurrentSubNVue().addEventListener("hide", function() {
+				console.log("subNVue子窗体已隐藏！")
+				uni.$emit("sub_nfc_show", {
+					show: false
+				})
+				that.closeBindingX()
+			});
+		},
+		methods: {
+			setBindingX(stop) {
+				let phone = this.$refs.phone
+				if (stop) {
+					let param = {
+						eventType: 'timing',
+						exitExpression: "t>2",
+						props: [{
+							element: phone.ref,
+							property: 'transform.rotateX',
+							expression: '0'
+
+						}, {
+							element: phone.ref,
+							property: "transform.translateY",
+							expression: '0'
+						}]
+					}
+					Binding.unbind({
+						token: this.phone_bind.token,
+						eventType: "timing"
+					})
+					let t = Binding.bind(param, (e) => {
+						if (e.state === 'exit') {
+							Binding.unbind({
+								token: t.token,
+								eventType: "timing"
+							})
+						}
+					});
+
+				} else {
+					let param = {
+						eventType: 'timing',
+						props: [{
+							element: phone.ref,
+							property: 'transform.rotateX',
+							expression: '(t%4500<2250)?(easeInOutQuint(t%4500,0,45,2250)):(easeInOutQuint(t%2250,45,0-45,2250))'
+
+						}, {
+							element: phone.ref,
+							property: "transform.translateY",
+							expression: '(t%4500<2250)?(easeInOutQuint(t%4500,0,12,2250)):(easeInOutQuint(t%2250,12,-12,2250))'
+						}]
+					}
+					this.phone_bind = Binding.bind(param);
+
+				}
+			},
+			closeBindingX() {
+				try {
+					this.setBindingX(true)
+
+
+				} catch (e) {}
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.page {
+		padding: 12rpx;
+		position: relative;
+	}
+
+	.card {
+		position: absolute;
+		top: 12rpx;
+		right: 12rpx;
+		bottom: 12rpx;
+		border-radius: 64rpx;
+		left: 12rpx;
+		background-color: #fff;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		.circle {
+			margin-top: 24rpx;
+			height: 340rpx;
+			width: 340rpx;
+			// background-color: #000;
+			// border-radius: 3200rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+
+			.inner {
+				position: absolute;
+				height: 120px;
+
+				align-items: center;
+				justify-content: center;
+				display: flex;
+				bottom: 32rpx;
+
+				.image {
+					height: 120px;
+					// bottom: -40rpx;
+					// border-radius: 0 0 240rpx 240rpx;
+
+				}
+			}
+
+
+			.white {
+				height: 340rpx;
+				width: 340rpx;
+				align-items: center;
+				justify-content: center;
+				display: flex;
+				overflow: hidden;
+
+				// border-bottom: 16rpx solid #5184fa;
+				// background-color: rgba(255,255,255,.5);
+				.white-circle {
+					background-color: transparent;
+					border: 16rpx solid #5184fa;
+					height: 340rpx;
+					width: 340rpx;
+					border-radius: 1000rpx;
+				}
+
+
+
+			}
+		}
+
+		.title {
+			font-size: 46rpx;
+			padding: 56rpx 0 32rpx 0;
+			color: #555;
+		}
+
+		.subtitle {
+			margin-top: 78rpx;
+			font-size: 36rpx;
+			color: #999;
+		}
+	}
+</style>

@@ -1,0 +1,458 @@
+<template>
+	<view :id="pid">
+		<scroll-view ref="tabs" :id="pid+'tab'" class="tab_scrol" :scroll-left="isScroll ? tempScrollLeft : 0" :style="{background:tabBgColor,
+			paddingLeft:`${scrollStart}px`,
+			whiteSpace:isScroll?'nowrap':'normal'}" :scroll-x="isScroll" :show-scrollbar="false">
+			<view class="tabContainer" :style="{flex:isScroll?'':'1'}">
+				<!-- 胶囊指示器 -->
+				<view v-if="tipType=='pill'" :class="isAnimation?'animationPill':'pill'"
+					:style="{ top:`${pillTop}px`,borderRadius:`${pillRatio}px`,left:'0rpx',transform:`translateX(${tipLeft}px)`,height:`${pillHeight}px`,width:`${tipWidth}px`,background:tipBgColor}">
+				</view>
+
+				<!-- TabItem主体 -->
+				<view class="tabItemParent">
+					<view class="tab_item" v-for="(item,i) in tabs"
+						:style="{flex:isScroll?0:1,paddingLeft:tabPaddingLeft,paddingBottom:tabPaddingBottom,paddingRight:tabPaddingRight,paddingTop:tabPaddingTop}">
+						<view @click="handSelectTab(i)" class="tab_item_controll" :id="pid+'tabItem'+i"
+							:ref="'tabItem'+i">
+							<!--图形-->
+							<image v-if="tabImages.length>i"
+								:style="{width:`${tabImageSize}px`,height:`${tabImageSize}px`}"
+								:src="tabImages.length>i?tabImages[i]:''"></image>
+							<!--文字-->
+							<text :style="{
+							fontSize:`${tabFontSize}px`,
+							color:value==i?actFontColor:normFontColor,
+							fontWeight:(value==i&&actFontBolder)?'bold':'normal'
+						}">{{item}}</text>
+						</view>
+
+					</view>
+				</view>
+
+				<!-- 底部指示器 -->
+				<view v-if="tipType=='norm'" :class="isAnimation?'animationTabTip':'tabTip'" :style="{width:tipWidth+'px',
+				background:tipBgColor,
+				transform:`translateX(${tipLeft}px)` 
+				}">
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				//是否需要动画,Swiper联动不需要动画
+				isAnimation: true,
+				scrollLeft: 0,
+				// 滑动距离左边的位置
+				tempScrollLeft: 0,
+				tabWidth: null,
+				tabTop: 0,
+				tabLeft: 0,
+				tabHeight: 0,
+				tabFlags: [],
+				tipWidth: 0,
+				tipLeft: 0,
+				tempTipLeft: 0,
+				tempTipWidth: 0,
+				pid: '',
+			}
+		},
+		mounted() {
+			let vm = this;
+			if (!vm.pid) {
+				vm.pid = 'per_' + vm.randomString();
+			}
+			if (vm.autoInit) {
+				vm.init();
+			} else {
+				uni.$on("perTabFlags" + vm.gid, data => {
+					if (data && (!vm.tabFlags || vm.tabFlags.length < 1)) {
+						vm.tabFlags = data.tabFlags;
+						vm.tabTop = data.tabTop;
+						vm.tabWidth = data.tabWidth;
+						vm.tabHeight = data.tabHeight;
+						vm.tabLeft = data.tabLeft;
+						vm.selectTab(vm.value);
+					}
+				})
+			}
+
+		},
+		beforeDestroy() {
+			uni.$off("perTabFlags" + this.gid);
+		},
+		methods: {
+			//获取整个Tab信息
+			init() {
+				let vm = this;
+				setTimeout(() => {
+					let query = uni
+						.createSelectorQuery()
+						// #ifndef MP-ALIPAY 
+						.in(vm)
+					// #endif
+					if (!vm.tabWidth) {
+						query.select(`#${vm.pid}tab`)
+							.boundingClientRect((data) => {
+								console.log('data', data);
+								if (data) {
+									vm.tabWidth = data.width;
+									vm.tabTop = data.top;
+									vm.tabHeight = data.height;
+									vm.tabLeft = data.left;
+									//计算每个Item得关键位置
+									vm.getTabFlags();
+								}
+							})
+							.exec()
+					}
+				}, 50)
+			},
+			//计算每个Item的标记
+			getTabFlags() {
+				let vm = this;
+				vm.tabFlags = [];
+				let pxStart = vm.scrollStart;
+				let pillStart = vm.pillPaddingLeft;
+				let pillEnd = vm.pillPaddingRight;
+				for (let i = 0; i < vm.tabs.length; i++) {
+					let query = uni
+						.createSelectorQuery()
+						// #ifndef MP-ALIPAY 
+						.in(vm)
+					// #endif  
+					query.select(`#${vm.pid}tabItem${i}`)
+						.boundingClientRect((data) => {
+							if (data) {
+								//获取之前Tab的总宽度
+								let item = {
+									//右边距离左边的长度
+									left: data.right,
+									//内容中心点
+									center: data.left + data.width / 2 - pxStart - vm.tabLeft,
+									//内容宽度
+									width: data.width,
+									//内容高度
+									height: data.height,
+									//内容上外边距
+									top: data.top
+								};
+								//底部指示器宽度
+								if (vm.tipType == 'norm') {
+									item.tipWidth = item.width * vm.lineScale * 1;
+								} else if (vm.tipType == 'pill') {
+									item.tipWidth = item.width + pillStart + pillEnd;
+								}
+								item.tipLeft = item.center - item.tipWidth / 2;
+								vm.tabFlags.push(item);
+								if (vm.tabFlags.length == vm.value + 1) {
+									vm.selectTab(vm.value);
+								}
+								if (vm.tabFlags.length == vm.tabs.length) {
+									setTimeout(() => {
+										//发送全局事件,通知其他tab
+										uni.$emit("perTabFlags" + vm.gid, {
+											tabWidth: vm.tabWidth,
+											tabTop: vm.tabTop,
+											tabHeight: vm.tabHeight,
+											tabFlags: vm.tabFlags,
+											tabLeft: vm.tabLeft
+										});
+									}, 500)
+								}
+							}
+						})
+						.exec();
+				}
+
+			},
+			//手动选择
+			handSelectTab(index) {
+				let vm = this;
+				vm.value = index;
+				vm.isAnimation = true;
+				this.$emit('change', index);
+
+			},
+			//非手动模式选中item
+			selectTab(index) {
+				let vm = this;
+				vm.tipWidth = vm.tabFlags[index].tipWidth;
+				vm.tempTipLeft = vm.tabFlags[index].tipLeft;
+				vm.tempTipWidth = vm.tabFlags[index].tipWidth;
+				vm.tipLeft = vm.tempTipLeft;
+				vm.tipWidth = vm.tempTipWidth;
+				vm.scrollAutoLeft();
+			},
+			//滚动条根据选择项自动滚动
+			scrollAutoLeft() {
+				let vm = this;
+				let itemLeft = vm.tabFlags[vm.value].left;
+				let tabCenter = vm.tabWidth / 2;
+				if (itemLeft > tabCenter && vm.value != 0) {
+					vm.tempScrollLeft = itemLeft - tabCenter + vm.scrollLeft;
+				} else {
+					vm.tempScrollLeft = vm.scrollLeft;
+				}
+			},
+			//Swiper滚动适配器
+			swiperApter(dx, swiperWidth, swiperIndex) {
+				if (swiperIndex != this.value) {
+					return;
+				}
+				let vm = this;
+				vm.$set(vm, 'isAnimation', false);
+				let distance = 0;
+				let andWidth = 0;
+				if (dx < 0) {
+					if (vm.value > 0) {
+						//左边
+						distance = vm.tabFlags[vm.value].tipLeft - vm.tabFlags[vm.value - 1].tipLeft + vm.tabLeft / 2;
+						andWidth = vm.tabFlags[vm.value].tipWidth - vm.tabFlags[vm.value - 1].tipWidth;
+					}
+				} else {
+					//右边
+					if (vm.value < vm.tabFlags.length - 1) {
+						distance = vm.tabFlags[vm.value + 1].tipLeft - vm.tabFlags[vm.value].tipLeft + vm.tabLeft / 2;
+						andWidth = vm.tabFlags[vm.value + 1].tipWidth - vm.tabFlags[vm.value].tipWidth;
+					}
+				}
+				if (distance == 0) {
+					return;
+				}
+				let pr = dx / swiperWidth;
+				let moveX = pr * distance;
+				let addW = pr * andWidth;
+				vm.$set(vm, 'tipLeft', vm.tempTipLeft + moveX);
+				vm.$set(vm, 'tipWidth', vm.tempTipWidth + addW);
+			},
+			// 产生随机字符串
+			randomString(len) {
+				len = len || 32
+				let $chars =
+					'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678' /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+				let maxPos = $chars.length
+				let pwd = ''
+				for (let i = 0; i < len; i++) {
+					pwd += $chars.charAt(Math.floor(Math.random() * maxPos))
+				}
+				return pwd
+			},
+		},
+		watch: {
+			value(val) {
+				this.selectTab(val);
+				this.$emit('input', val)
+			}
+		},
+		props: {
+			//norm(底部滑线模式),pill(药丸胶囊模式)
+			tipType: {
+				type: String,
+				default: 'norm'
+			},
+			//数据源
+			tabs: {
+				type: Array,
+				default: []
+			},
+			tabImages: {
+				type: Array,
+				default () {
+					return []
+				}
+			},
+			//整个tab左边距
+			scrollStart: {
+				type: Number,
+				default: 13
+			},
+			//当前选中项
+			value: {
+				type: Number,
+				default () {
+					return 0
+				}
+			},
+			//tabItem左内边距
+			tabPaddingLeft: {
+				type: String,
+				default: '7px'
+			},
+			///tabItem右内边距
+			tabPaddingRight: {
+				type: String,
+				default: '7px'
+			},
+			///tabItem上内边距
+			tabPaddingTop: {
+				type: String,
+				default: '5px'
+			},
+			///tabItem下内边距
+			tabPaddingBottom: {
+				type: String,
+				default: '5px'
+			},
+			//tabItem文字大小
+			tabFontSize: {
+				type: Number,
+				default: 15
+			},
+			//tabImage图片大小
+			tabImageSize: {
+				type: Number,
+				default: 20
+			},
+			//选中时文字颜色
+			actFontColor: {
+				type: String,
+				default: '#ffffff'
+			},
+			//选中时文字是否加粗
+			actFontBolder: {
+				type: Boolean,
+				default: true,
+			},
+			//普通文字颜色
+			normFontColor: {
+				type: String,
+				default: '#ffffff'
+			},
+			//tab背景颜色
+			tabBgColor: {
+				type: String,
+				default: 'rgba(0,0,0,0)'
+			},
+			//指示器背景颜色(胶囊和底部共同使用)
+			tipBgColor: {
+				type: String,
+				default: '#fffbfc'
+			},
+			//胶囊圆率
+			pillRatio: {
+				type: Number,
+				default: 30
+			},
+			//胶囊距离内部上边距(用到的地方很少,大部分可通过tabClass+itemPadding实现)
+			pillTop: {
+				type: Number,
+				default: 0
+			},
+			//胶囊高度
+			pillHeight: {
+				type: Number,
+				default: 30
+			},
+			//胶囊距离文字左边距
+			pillPaddingLeft: {
+				type: Number,
+				default: 4
+			},
+			//胶囊距离文字右边距
+			pillPaddingRight: {
+				type: Number,
+				default: 4
+			},
+			//是否是滑动Tab
+			isScroll: {
+				type: Boolean,
+				default: false
+			},
+			//底部滚动条比列(按tab内容大小为基数)
+			lineScale: {
+				type: Number,
+				default: 0.5
+			},
+			//组Id(作为Swiper内部组件时,需要定义分组)
+			gid: {
+				type: String,
+				default () {
+					return ''
+				}
+			},
+			//自动初始化
+			autoInit: {
+				type: Boolean,
+				default: true
+			},
+		},
+	}
+</script>
+
+<style>
+	.tab_scrol {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		padding-bottom: 14rpx;
+	}
+
+	.tabContainer {
+		/* #ifndef APP-NVUE */
+		flex: 1;
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+	}
+
+	.tabItemParent {
+		/* #ifndef APP-NVUE */
+		flex: 1;
+		display: flex;
+		z-index:9999;
+		/* #endif */
+		flex-direction: row;
+
+	}
+
+	.tab_item {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.tab_item_controll {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+	}
+
+
+	.tabTip {
+		border-radius: 30rpx;
+		height: 14rpx;
+		transition-property: width, transform;
+		transition-duration: 0s;
+	}
+
+	.animationTabTip {
+		border-radius: 30rpx;
+		height: 14rpx;
+		transition-property: width, transform;
+		transition-duration: 0.25s;
+	}
+
+	.pill {
+		position: absolute;
+		transition-property: width, transform;
+		transition-duration: 0s;
+	}
+
+	.animationPill {
+		position: absolute;
+		transition-property: width, transform;
+		transition-duration: 0.25s;
+	}
+</style>

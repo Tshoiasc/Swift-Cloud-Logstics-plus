@@ -1,0 +1,300 @@
+<template name="orderCard">
+	<view class="order" :style="'position: relative;'+(staff?'height:228rpx':'')">
+		<view class="head-part">
+			<view class="id">
+				<text class="id_content">运单号：YJ{{data?data._id:''}}</text>
+				<tui-icon name="partake" size="12" color="#999" style="margin-left: 12rpx;"></tui-icon>
+			</view>
+			<text class="status" v-if="!staff">
+				已变更
+			</text>
+		</view>
+		<view class="address-to" v-if="!staff">
+			<view class="from">
+				<text class="address">
+					{{data.send?data.send.address:""}}
+				</text>
+				<text class="name">
+					{{data.send?data.send.name:""}}
+				</text>
+			</view>
+
+			<view class="status">
+				<!-- #ifdef APP-PLUS -->
+				<image class="arrow"
+					src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E7%AE%AD%E5%A4%B4.png?sign=b3cb2d20ede8c8e6667d67c3d379192b&t=1650360723"
+					mode="scaleToFill"></image>
+				<!-- <tui-icon class="arrow" name="toright" color="#5483ee"></tui-icon> -->
+				<!-- #endif -->
+				<!-- #ifndef APP-PLUS -->
+				<image class="arrow"
+					src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E7%AE%AD%E5%A4%B4%20(1).png?sign=5b32773fb300524a9f039510c9e98494&t=1650360732"
+					mode="scaleToFill"></image>
+				<!-- #endif -->
+				<text class="status-content">
+					已签收
+				</text>
+			</view>
+			<view class="to">
+				<text class="address">
+					{{data.receive?data.receive.address:""}}
+				</text>
+				<text class="name">
+					{{data.receive?data.receive.name:""}}
+				</text>
+			</view>
+
+		</view>
+		<view class="current-status-part" v-if="!staff">
+
+			<view class="line">
+				<text class="title">
+					已签收：
+				</text>
+				<text class="content">
+					您的快件已签收，如有疑问请联系快递员
+				</text>
+			</view>
+			<view class="line">
+				<text class="title">
+					签收时间：
+				</text>
+				<text class="content">
+					2022-02-27 17:44
+				</text>
+			</view>
+		</view>
+		<view class="current-status-part"
+			style="margin: 24rpx 0;padding-bottom: 24rpx;height: 232rpx;justify-content: center;" v-else>
+			<view class="line">
+				<text class="title">
+					寄件人：
+				</text>
+				<view class="content" style="display: flex;align-items: center;flex-direction: row;">
+					<text style="font-size: 24rpx;">{{data.send.name.slice(0,1)}}</text>
+					<text style="font-size: 24rpx;" v-for="index of (data.send.name.length - 1)">*</text>
+					<text style="font-size: 24rpx;margin-left: 12rpx;"> 尾号{{data.send.phone.slice(-4)}}</text>
+				</view>
+			</view>
+			<view class="line">
+				<text class="title">
+					收件人：
+				</text>
+				<view class="content" style="display: flex;align-items: center;flex-direction: row;">
+					<text style="font-size: 24rpx;">{{data.receive.name.slice(0,1)}}</text>
+					<text style="font-size: 24rpx;" v-for="index of (data.receive.name.length - 1)">*</text>
+					<text style="font-size: 24rpx;margin-left: 12rpx;"> 尾号{{data.receive.phone.slice(-4)}}</text>
+				</view>
+			</view>
+			<view class="line">
+				<text class="title">
+					物品介绍：
+				</text>
+				<text class="content">
+					{{data.info}}
+
+				</text>
+			</view>
+			<view class="line">
+				<text class="title">
+					运送类别：
+				</text>
+				<text class="content">
+					{{data.title}}
+
+				</text>
+			</view>
+			<view class="line">
+				<text class="title">
+					提交时间：
+				</text>
+				<text class="content">
+					{{friendlyDate2(data.create_time)}}
+
+				</text>
+			</view>
+			<image
+				src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E5%AE%A2%E6%88%B7%E5%BD%95%E5%85%A5%E7%AE%A1%E7%90%86-02.png?sign=c695d604033bb9acb9b71c1270653e92&t=1650659676"
+				mode="heightFix" style="position: absolute;height: 80rpx;right: 24rpx;" @click="onClickPush()">
+			</image>
+		</view>
+		<view class="button-under" v-if="!staff">
+			<!-- #ifdef APP-PLUS -->
+			<u-button class="button" type="primary" size="mini" shape="circle" :plain="true" text="通知收件人"></u-button>
+			<u-button class="button" type="primary" size="mini" shape="circle" :plain="true" text="删除"
+				@click="onClickDelete"></u-button>
+			<!-- #endif -->
+			<!-- #ifndef APP-PLUS -->
+			<u-button class="button" type="warning" size="mini" shape="circle" text="通知收件人"></u-button>
+			<u-button class="button" type="warning" size="mini" shape="circle" text="删除"></u-button>
+			<!-- #endif -->
+		</view>
+
+	</view>
+
+</template>
+
+<script>
+	import {
+		friendlyDate
+	} from '@/common/util'
+	export default {
+		props: {
+			staff: {
+				type: Boolean,
+				value: false
+			},
+			data: {
+				type: Object
+			}
+		},
+		emits: ["onClick"],
+		methods: {
+			friendlyDate2(e) {
+				return friendlyDate(e)
+			},
+			onClickPush() {
+				this.$emit("onClick", "push")
+			},
+		}
+	}
+</script>
+
+<style lang="scss">
+	.order {
+		height: 512rpx !important;
+		width: 702rpx !important;
+		background-color: #fff;
+		overflow: hidden;
+		border-radius: 12rpx;
+
+		// margin: 24rpx 0;
+		.head-part {
+			height: 72rpx;
+			font-size: 22rpx !important;
+			display: flex;
+			align-items: center;
+			flex-direction: row;
+			border-bottom: 1rpx solid #eee;
+			position: relative;
+
+			.id {
+				position: absolute;
+				left: 24rpx;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				.id_content {
+					color: #999;
+					font-size: 22rpx !important;
+				}
+			}
+
+			.status {
+				position: absolute;
+				color: rgba(255, 128, 0, 0.5);
+				font-weight: 600;
+				right: 24rpx;
+				font-size: 22rpx !important;
+			}
+		}
+
+		.address-to {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-direction: row;
+			height: 220rpx;
+
+			.from,
+			.to {
+				width: 230rpx;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				.address {
+					font-size: 38rpx;
+					font-weight: bold;
+				}
+
+				.name {
+					font-size: 26rpx;
+					color: #777;
+				}
+			}
+
+			.status {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				.arrow {
+					width: 120rpx;
+					height: 40rpx;
+				}
+
+				.status-content {
+					font-size: 24rpx;
+					color: #999;
+				}
+			}
+
+
+		}
+
+		.current-status-part {
+			margin-top: 6rpx;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			height: 124rpx;
+
+			border-bottom: 1rpx solid #eee;
+
+			.line {
+				margin: 6rpx 24rpx;
+				display: flex;
+				flex-direction: row;
+
+				.title {
+					color: #999;
+					font-size: 24rpx;
+				}
+
+				.content {
+					margin-left: 2rpx;
+					color: #333;
+					font-size: 24rpx;
+				}
+			}
+
+		}
+
+		.button-under {
+			width: 351rpx;
+			display: flex;
+			flex-direction: row;
+			position: absolute;
+			align-items: center;
+			right: 24rpx;
+			height: 86rpx;
+			bottom: 0;
+			/* #ifdef MP-WEIXIN */
+			gap: 24rpx;
+
+			/* #endif */
+			// top:12rpx;
+			// padding: 24rpx 0rpx;
+			.button {
+				/* #ifndef MP-WEIXIN */
+				margin-right: 24rpx;
+				/* #endif */
+				width: 160rpx;
+			}
+		}
+	}
+</style>

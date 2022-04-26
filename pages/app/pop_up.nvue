@@ -1,0 +1,152 @@
+<template>
+	<view class="u-page">
+		<view class="title-sm">
+			<text style="font-size: 30rpx;font-weight: bold;">请选择您要切换的组织</text>
+			<u-icon name="close" color="#999" size="16" class="close" @click="onclose"></u-icon>
+		</view>
+		<view class="border" id="#border" ref="border">
+
+		</view>
+		<u-list @scrolltolower="scrolltolower" style="height: 920rpx;">
+			<u-list-item v-for="(item, index) in list" :key="index">
+				<u-cell :title="`${item.name}`" :value="item.subname" :clickable="true" @click="onClick(item)">
+					<u-avatar slot="icon" shape="square" size="32"
+						src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E9%A9%BF%E7%AB%99%20(1).png?sign=f96172059fb7c6f6b7c4a2634bd7d9ee&t=1650634773"
+						customStyle="margin: -3px 5px -3px 0"></u-avatar>
+				</u-cell>
+			</u-list-item>
+		</u-list>
+
+	</view>
+</template>
+<script>
+	export default {
+		data() {
+			return {
+
+				list: [{
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '月亮路路21号菜鸟驿站',
+						subname: "副站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					}, {
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '月亮路路21号菜鸟驿站',
+						subname: "副站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					}, {
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '月亮路路21号菜鸟驿站',
+						subname: "副站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					}, {
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '月亮路路21号菜鸟驿站',
+						subname: "副站长",
+						color: '#333',
+						fontSize: '16'
+					},
+					{
+						name: '太阳路28号菜鸟驿站',
+						subname: "站长",
+						color: '#333',
+						fontSize: '16'
+					}
+				]
+			}
+		},
+		onShow() {
+			console.log("出现了")
+		},
+		onLoad() {
+			uni.$on("app_popup_show", (e) => {
+				if (e.show) {
+					console.log(this.$refs.border)
+					// uni.createSelectorQuery().select("#border").boundingClientRect(rect => console.log(rect))
+					// 	.exec()
+				}
+			})
+		},
+		methods: {
+			onclose() {
+				const subNVue = uni.getSubNVueById('app_popup')
+				subNVue.hide("slide-out-bottom", 300)
+			},
+			onClick(e) {
+
+				uni.$emit('app_popup', e);
+				this.onclose()
+			},
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.u-page {
+		margin: 6rpx 0 0 0;
+		background-color: #fff;
+		box-shadow: 0 -8rpx 6rpx rgba(240, 240, 240, .8);
+		border-radius: 32rpx 32rpx 0 0;
+		padding-bottom: 24rpx;
+
+		.title-sm {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 750rpx;
+			padding: 28rpx 0 28rpx 0;
+
+			.close {
+				position: absolute;
+				right: 36rpx;
+			}
+		}
+
+
+
+		.border {
+			border-bottom: 1rpx solid #eee;
+		}
+	}
+</style>

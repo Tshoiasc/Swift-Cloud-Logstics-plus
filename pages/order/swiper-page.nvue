@@ -1,0 +1,243 @@
+<template>
+	<view class="uni-swiper-page">
+		<list ref="list" class="list" @scroll="bindScroll" @loadmore="onLoadMore" :loadmoreoffset="10"
+			:scrollable="systemInfo.platform == 'ios' || !page_refreshing">
+			<refresh class="refresh" @refresh="onRefresh" :display="page_refreshing?'show':'hide'"
+				@pullingdown="onPullingDown" style="position: relative;">
+				<view class="refresh_box"
+					style="width: 750rpx;display: flex;flex-direction: row;align-items: center;justify-content: center;height: 60px;">
+					<!-- <loading-indicator color="#999" v-if="page_refreshing"></loading-indicator> -->
+					<view
+						style="height: 80rpx;position: absolute;opacity: .7;width: 750rpx;left: 0;right: 0;bottom: 0;height: 50px;">
+						<view class="sub-box" ref="sunBox"
+							style="height: 40px;width:40px;position: absolute;z-index: 9;left:230rpx;">
+							<image ref="sun"
+								src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E6%99%B4%E5%A4%A9.png"
+								mode="scaleToFill" style="height: 40px;width:40px;"></image>
+						</view>
+
+
+						<image ref="icon"
+							src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E9%98%B4%E5%A4%A9.png"
+							mode="scaleToFill"
+							style="height: 50px;width:60px;position: absolute;z-index: 10;left:225rpx;"></image>
+
+					</view>
+					<text
+						style="color: #999;position: absolute;left: 360rpx;font-size: 32rpx;background-color: #f7f7f7;font-weight: bold;">{{page_refreshing?'正在刷新':'松手即可刷新'}}</text>
+					<text ref="continu"
+						style="color: #999;position: absolute;left:  360rpx;font-size: 32rpx;background-color: #f7f7f7;font-weight: bold;">继续下拉刷新</text>
+				</view>
+			</refresh>
+			<cell
+				style="width: 750rpx;z-index: 99999;height: 100vh;justify-content: center;display: flex;align-items: center;"
+				v-if="data.length == 0">
+
+				<u-empty style="margin-top: 120rpx;" mode="order" textSize="16" width="180" height="180"
+					icon="http://cdn.uviewui.com/uview/empty/order.png">
+				</u-empty>
+			</cell>
+			<cell v-for="(item, index) in data" :key="item.id" :ref="'item'+index" v-else>
+				<view class="list-item">
+					<orderCard :staff="false" :data="item"></orderCard>
+				</view>
+			</cell>
+
+			<cell class="loading"></cell>
+			<cell style="padding-bottom:24rpx;"></cell>
+		</list>
+	</view>
+</template>
+<script>
+	const Binding = uni.requireNativePlugin('bindingx');
+	import orderCard from './order_app/orderCard.nvue';
+	export default {
+		components: {
+			orderCard
+		},
+		props: {
+			data: Array,
+			pid: {
+				type: [Number, String],
+				default: ''
+			},
+			parentId: {
+				type: String,
+				default: ''
+			}
+		},
+
+		data() {
+			return {
+				scrollable: true,
+				dataList: [],
+				page_refreshing: false,
+				refresh_bindingX: {},
+				text: "继续下拉刷新",
+				systemInfo: {}
+			}
+		},
+		created() {
+			this.systemInfo = uni.getSystemInfoSync()
+			for (var i = 0; i < 30; i++) {
+				this.dataList.push({
+					id: i,
+					name: i
+				});
+			}
+		},
+		methods: {
+			onLoadMore: function(e) {
+				console.log(e)
+			},
+			getEl: function(el) {
+				if (typeof el === 'string' || typeof el === 'number') return el;
+				if (WXEnvironment) {
+					return el.ref;
+				} else {
+					return el instanceof HTMLElement ? el : el.$el;
+				}
+			},
+
+			bindScroll(e) {
+				// console.log(e)
+			},
+			onRefresh() {
+				Binding.unbind({
+					token: this.refresh_bindingX.token,
+					eventType: "scroll"
+				})
+				// console.log(this.$refs)
+				let sun = this.getEl(this.$refs.sun)
+				console.log(this.$refs.sunBox)
+				this.page_refreshing = true
+				let props;
+
+				if (this.systemInfo.platform == 'ios') {
+					props = [{
+						element: sun,
+						property: 'opacity',
+						expression: `easeInOutElastic(t%1000,0.8,1,1000)`
+					}]
+				} else {
+					props = [{
+						element: sun,
+						property: 'transform.scale',
+						expression: `0.8 + t%1000/5000`
+					}]
+				}
+
+				let sunBindingX = Binding.bind({
+					eventType: 'timing',
+					props
+				}, function(res) {
+
+					console.log("执行了", res)
+				});
+				let that = this
+				setTimeout(async () => {
+					this.$emit("refresh", {
+						returnDo: () => {
+							this.page_refreshing = false
+							Binding.unbind({
+								token: sunBindingX.token,
+								eventType: "timing"
+							})
+							uni.showToast({
+								title: "刷新成功",
+								icon: "none"
+							})
+						},
+						pid: that.pid
+					})
+					// plus.navigator.setStatusBarStyle("light");
+					// this.theme = 'light'
+
+				}, 5000)
+			},
+			onPullingDown(e) {
+				let {
+					pullingDistance,
+					viewHeight
+				} = e
+				let list = this.$refs.list.ref
+				let main_image = this.$refs.icon.ref
+				let continu = this.$refs.continu.ref
+				let that = this
+				if (!this.page_refreshing) {
+					let main_bindingX = Binding.bind({
+						anchor: list,
+						eventType: 'scroll',
+						props: [{
+							element: main_image,
+							property: 'transform.translateX',
+							expression: `y>0?0:(y<${(that.systemInfo.platform == 'ios' ?-viewHeight* 2 : -60)}?-30:y/${that.systemInfo.platform == 'ios'?viewHeight/15:2})`
+							// expression: `easeInExpo(y,0,0-${(-viewHeight)},200)`
+						}, {
+							element: continu,
+							property: 'opacity',
+							expression: `y<=${(that.systemInfo.platform == 'ios' ?-viewHeight* 2 : -60)}?0:1`
+						}]
+					}, function(res) {
+						if (res.state === 'exit') {
+							Binding.unbind({
+								token: main_bindingX.token,
+								eventType: 'scroll'
+							})
+						}
+					});
+					this.refresh_bindingX = main_bindingX
+					// console.log(main_bindingX)
+				}
+			},
+			setScrollRef(height) {
+				if (this.$refs['list'].setSpecialEffects) {
+					this.$refs['list'].setSpecialEffects({
+						id: this.parentId,
+						headerHeight: height
+					});
+				}
+			},
+			loadData() {
+				// 首次激活时被调用
+			},
+			clear() {
+				// 释放数据时被调用，参考 swiper-list 缓存配置
+				this.dataList.length = 0;
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.uni-swiper-page {
+		flex: 1;
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+	}
+
+	.list {
+		flex: 1;
+		background-color: #f7f7f7;
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		flex-direction: column;
+	}
+
+	.list-item {
+		align-items: center;
+		background-color: #fff;
+		border-radius: 5px;
+		margin: 12rpx 24rpx;
+	}
+
+	.loading {
+		height: 20px;
+	}
+</style>

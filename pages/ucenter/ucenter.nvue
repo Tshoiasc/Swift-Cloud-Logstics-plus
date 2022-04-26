@@ -1,0 +1,151 @@
+<template>
+	<scroller ref="root" @scroll="onScroll">
+		<view class="navbar" ref="navbar"
+			:style="`opacity:0;height:${systemInfo.platform == 'ios' ? systemInfo.safeArea.top+44 :systemInfo.safeArea.top+ 48}px;padding-top:${systemInfo.safeArea.top}px`">
+			<view class="left" @click="toUserInfo"
+				:style="'display: flex;align-items: center;flex-direction: row;height:'+(systemInfo.platform == 'ios' ?44:48)+'px'">
+				<div style="border-radius: 64px;overflow: hidden;margin: 0 24rpx;">
+					<image class="navbar__avatar" mode="scaleToFill"
+						style="border-radius: 64px;margin: 0 12rpx 0 24rpx;width: 64rpx;height: 64rpx;"
+						v-if="userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl"
+						:src="userInfo.avatar_file.tempUrl.download_url">
+					</image>
+				</div>
+
+				<view class="name" v-if="userInfo.nickname||userInfo.username||userInfo.mobile">
+					<text
+						style="font-size: 28rpx; padding: 0 12rpx;">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
+				</view>
+			</view>
+
+
+		</view>
+		<view class="head_bg"
+			style="position: absolute;top: 0;left: 0;right: 0;height: 560rpx;background-image: linear-gradient(to bottom, rbga(	175,238,238,.8)	#E1FFFF,#f7f7f7);">
+
+		</view>
+		<view class="container"
+			:style="`padding-top:${systemInfo.platform == 'ios' ? systemInfo.safeArea.top+22 :systemInfo.safeArea.top+ 24}px`">
+
+			<view class="userinfo" @click="toUserInfo">
+				<view class="avatar">
+					<image class="navbar__avatar" mode="scaleToFill"
+						style="border-radius: 128px;margin: 0 12rpx 0 24rpx;width: 96rpx;height:96rpx;"
+						v-if="userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl"
+						:src="userInfo.avatar_file.tempUrl.download_url">
+					</image>
+					<view class=""
+						style="position: absolute;bottom:6rpx;right:12rpx;background-color: #5184fa;border-radius: 64rpx;height: 32rpx;width: 32rpx;display: flex;align-items: center;justify-content: center;">
+						<text style="color: white;font-size: 24rpx;font-weight: bold;line-height: 24rpx;">v</text>
+					</view>
+				</view>
+
+				<view class="name" v-if="userInfo.nickname||userInfo.username||userInfo.mobile"
+					style="display: flex;flex-direction: column; margin: 0 12rpx;">
+					<view class="">
+						<text
+							style="font-size:42rpx;font-weight: 500;">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
+
+					</view>
+
+					<view class=""
+						style="position:relative;display: flex;align-items: center;flex-direction: row;margin-top: 6rpx;">
+						<text
+							style="font-size: 20rpx;color:#9eb8eb;left: 0;background-color: #d7e9ff;border-radius: 24rpx;padding-left: 12rpx;padding-right: 12rpx;padding-top: 2rpx;padding-bottom: 2rpx;">太阳路菜鸟驿站</text>
+					</view>
+				</view>
+				<view class="right"
+					style="position: absolute;right: 36rpx;display: flex;align-items: center;justify-content: center;top: 0;bottom: 0;">
+					<view class="flex">
+						<text style="font-size: 26rpx;font-weight: 400;color: #999;">主页</text>
+						<tui-icon name="arrowright" size="18" style="margin-left: 4rpx;"></tui-icon>
+					</view>
+				</view>
+			</view>
+			<view class="" style="height: 58px;" v-for="index of [1,2,3,4,5,6,7,8,9,7,5,4,5,5,1,5,5,5,5,5]">
+				fdsaf
+			</view>
+
+		</view>
+
+	</scroller>
+</template>
+
+<script>
+	import {
+		mapGetters,
+		mapMutations
+	} from 'vuex';
+	const Binding = uni.requireNativePlugin('bindingx');
+	export default {
+		computed: {
+			...mapGetters({
+				userInfo: 'user/info',
+				hasLogin: 'user/hasLogin',
+				systemInfo: 'user/systemInfo',
+				orders: "user/orders"
+			})
+		},
+		data() {
+			return {
+				bindingXItem: {}
+			}
+		},
+		onReady() {
+			let root = this.$refs.root.ref
+			let navbar = this.$refs.navbar.ref
+			let that = this
+			let navbarHeight = that.systemInfo.safeArea.top + (that.systemInfo.platform == 'ios' ? 44 : 48)
+			this.bindingXItem = Binding.bind({
+				anchor: root,
+				eventType: 'scroll',
+				props: [{
+					element: navbar,
+					property: 'opacity',
+					expression: `y<=${navbarHeight}?y/${navbarHeight}:1`
+				}]
+			}, function(res) {
+				if (res.state === 'exit') {
+					Binding.unbind({
+						token: this.bindingXItem.token,
+						eventType: 'scroll'
+					})
+				}
+			});
+		},
+		methods: {
+			toUserInfo() {
+				uni.navigateTo({
+					url: '/pages/ucenter/settings/settings'
+				})
+			},
+			onScroll(e) {
+				// console.log(e)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.navbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		background-color: #fff;
+	}
+
+	.userinfo {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		height: 200rpx;
+		// background-color: #000;
+	}
+
+	.flex {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+</style>
