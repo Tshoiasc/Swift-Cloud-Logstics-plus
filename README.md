@@ -566,4 +566,4 @@ uni-starter
 ## 第三方插件（感谢插件作者，排名不分前后）：
 1. 图片裁剪 [limeClipper](https://ext.dcloud.net.cn/plugin?id=3594) @作者： 陌上华年
 2. 二维码生成 [Sansnn-uQRCode](https://ext.dcloud.net.cn/plugin?id=1287) @作者： 3snn
-3. clipboard.js [clipboard](https://clipboardjs.com/)
+3. clipboard.js [clipboard](https://clipboardjs.com/)# NFC_EXPRESS_BS
