@@ -1,0 +1,46 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"uid": {
+			"bsonType": "string",
+			"description": "任职者userid， 参考`uni-id-users` 表",
+			"foreignKey": "uni-id-users._id"
+		},
+		"office_id": {
+			"bsonType": "string",
+			"description": "所任组织id",
+			"foreignKey": "opendb-department._id",
+			"enum": {
+				"collection": "opendb-department",
+				"field": "name as text, _id as value"
+			}
+		},
+		"position_id": {
+			"bsonType": "array",
+			"description": "所任职位id",
+			"foreignKey": "position.permission_id",
+			"enum": {
+				"collection": "position-permission",
+				"field": "permission_name as text, permission_id as value"
+			}
+		},
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "任职时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+}

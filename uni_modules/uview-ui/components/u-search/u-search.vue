@@ -1,72 +1,38 @@
 <template>
-	<view
-	    class="u-search"
-	    @tap="clickHandler"
-	    :style="[{
+	<view class="u-search" @tap="clickHandler" :style="[{
 			margin: margin,
-		}, $u.addStyle(customStyle)]"
-	>
-		<view
-		    class="u-search__content"
-		    :style="{
+		}, $u.addStyle(customStyle)]">
+		<view class="u-search__content" :style="{
 				backgroundColor: bgColor,
 				borderRadius: shape == 'round' ? '100px' : '4px',
 				borderColor: borderColor,
-			}"
-		>
+			}">
 			<template v-if="$slots.label || label !== null">
 				<slot name="label">
 					<text class="u-search__content__label">{{ label }}</text>
 				</slot>
 			</template>
 			<view class="u-search__content__icon">
-				<u-icon
-					@tap="clickIcon"
-				    :size="searchIconSize"
-				    :name="searchIcon"
-				    :color="searchIconColor ? searchIconColor : color"
-				></u-icon>
+				<u-icon @tap="clickIcon" :size="searchIconSize" :name="searchIcon"
+					:color="searchIconColor ? searchIconColor : color"></u-icon>
 			</view>
-			<input
-			    confirm-type="search"
-			    @blur="blur"
-			    :value="value"
-			    @confirm="search"
-			    @input="inputChange"
-			    :disabled="disabled"
-			    @focus="getFocus"
-			    :focus="focus"
-			    :maxlength="maxlength"
-			    placeholder-class="u-search__content__input--placeholder"
-			    :placeholder="placeholder"
-			    :placeholder-style="{color:placeholderColor}"
-			    class="u-search__content__input"
-			    type="text"
-			    :style="[{
+			<input confirm-type="search" @blur="blur" :value="value" @confirm="search" @input="inputChange"
+				:disabled="disabled" @focus="getFocus" :focus="focus" :maxlength="maxlength"
+				placeholder-class="u-search__content__input--placeholder" :placeholder="placeholder"
+				:placeholder-style="{color:placeholderColor}" class="u-search__content__input" :adjust-position="false"
+				type="text" :style="[{
 					textAlign: inputAlign,
 					color: color,
 					height: $u.addUnit(height)
-				}, inputStyle]"
-			/>
-			<view
-			    class="u-search__content__icon u-search__content__close"
-			    v-if="keyword && clearabled && focused"
-			    @tap="clear"
-			>
-				<u-icon
-				    name="close"
-				    size="11"
-				    color="#ffffff"
-					customStyle="line-height: 12px"
-				></u-icon>
+				}, inputStyle]" />
+			<view class="u-search__content__icon u-search__content__close" v-if="keyword && clearabled && focused"
+				@tap="clear">
+				<u-icon name="close" size="11" color="#ffffff" customStyle="line-height: 12px"></u-icon>
 			</view>
 		</view>
-		<text
-		    :style="[actionStyle]"
-		    class="u-search__action"
-		    :class="[(showActionBtn || show) && 'u-search__action--active']"
-		    @tap.stop.prevent="custom"
-		>{{ actionText }}</text>
+		<text :style="[actionStyle]" class="u-search__action"
+			:class="[(showActionBtn || show) && 'u-search__action--active']"
+			@tap.stop.prevent="custom">{{ actionText }}</text>
 	</view>
 </template>
 
@@ -110,7 +76,7 @@
 	 */
 	export default {
 		name: "u-search",
-		mixins: [uni.$u.mpMixin, uni.$u.mixin,props],
+		mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
 		data() {
 			return {
 				keyword: '',
@@ -201,102 +167,103 @@
 </script>
 
 <style lang="scss" scoped>
-@import "../../libs/css/components.scss";
-$u-search-content-padding: 0 10px !default;
-$u-search-label-color: $u-main-color !default;
-$u-search-label-font-size: 14px !default;
-$u-search-label-margin: 0 4px !default;
-$u-search-close-size: 20px !default;
-$u-search-close-radius: 100px !default;
-$u-search-close-bgColor: #C6C7CB !default;
-$u-search-close-transform: scale(0.82) !default;
-$u-search-input-font-size: 14px !default;
-$u-search-input-margin: 0 5px !default;
-$u-search-input-color: $u-main-color !default;
-$u-search-input-placeholder-color: $u-tips-color !default;
-$u-search-action-font-size: 14px !default;
-$u-search-action-color: $u-main-color !default;
-$u-search-action-width: 0 !default;
-$u-search-action-active-width: 40px !default;
-$u-search-action-margin-left: 5px !default;
+	@import "../../libs/css/components.scss";
+	$u-search-content-padding: 0 10px !default;
+	$u-search-label-color: $u-main-color !default;
+	$u-search-label-font-size: 14px !default;
+	$u-search-label-margin: 0 4px !default;
+	$u-search-close-size: 20px !default;
+	$u-search-close-radius: 100px !default;
+	$u-search-close-bgColor: #C6C7CB !default;
+	$u-search-close-transform: scale(0.82) !default;
+	$u-search-input-font-size: 14px !default;
+	$u-search-input-margin: 0 5px !default;
+	$u-search-input-color: $u-main-color !default;
+	$u-search-input-placeholder-color: $u-tips-color !default;
+	$u-search-action-font-size: 14px !default;
+	$u-search-action-color: $u-main-color !default;
+	$u-search-action-width: 0 !default;
+	$u-search-action-active-width: 40px !default;
+	$u-search-action-margin-left: 5px !default;
 
-/* #ifdef H5 */
-// iOS15在H5下，hx的某些版本，input type=search时，会多了一个搜索图标，进行移除
-[type="search"]::-webkit-search-decoration {
-    display: none;
-}
-/* #endif */
+	/* #ifdef H5 */
+	// iOS15在H5下，hx的某些版本，input type=search时，会多了一个搜索图标，进行移除
+	[type="search"]::-webkit-search-decoration {
+		display: none;
+	}
 
-.u-search {
-	@include flex(row);
-	align-items: center;
-	flex: 1;
+	/* #endif */
 
-	&__content {
-		@include flex;
+	.u-search {
+		@include flex(row);
 		align-items: center;
-		padding: $u-search-content-padding;
 		flex: 1;
-		justify-content: space-between;
-		border-width: 1px;
-		border-color: transparent;
-		border-style: solid;
-		overflow: hidden;
 
-		&__icon {
+		&__content {
 			@include flex;
 			align-items: center;
-		}
-
-		&__label {
-			color: $u-search-label-color;
-			font-size: $u-search-label-font-size;
-			margin: $u-search-label-margin;
-		}
-
-		&__close {
-			width: $u-search-close-size;
-			height: $u-search-close-size;
-			border-top-left-radius: $u-search-close-radius;
-			border-top-right-radius: $u-search-close-radius;
-			border-bottom-left-radius: $u-search-close-radius;
-			border-bottom-right-radius: $u-search-close-radius;
-			background-color: $u-search-close-bgColor;
-			@include flex(row);
-			align-items: center;
-			justify-content: center;
-			transform: $u-search-close-transform;
-		}
-
-		&__input {
+			padding: $u-search-content-padding;
 			flex: 1;
-			font-size: $u-search-input-font-size;
-			line-height: 1;
-			margin: $u-search-input-margin;
-			color: $u-search-input-color;
+			justify-content: space-between;
+			border-width: 1px;
+			border-color: transparent;
+			border-style: solid;
+			overflow: hidden;
 
-			&--placeholder {
-				color: $u-search-input-placeholder-color;
+			&__icon {
+				@include flex;
+				align-items: center;
+			}
+
+			&__label {
+				color: $u-search-label-color;
+				font-size: $u-search-label-font-size;
+				margin: $u-search-label-margin;
+			}
+
+			&__close {
+				width: $u-search-close-size;
+				height: $u-search-close-size;
+				border-top-left-radius: $u-search-close-radius;
+				border-top-right-radius: $u-search-close-radius;
+				border-bottom-left-radius: $u-search-close-radius;
+				border-bottom-right-radius: $u-search-close-radius;
+				background-color: $u-search-close-bgColor;
+				@include flex(row);
+				align-items: center;
+				justify-content: center;
+				transform: $u-search-close-transform;
+			}
+
+			&__input {
+				flex: 1;
+				font-size: $u-search-input-font-size;
+				line-height: 1;
+				margin: $u-search-input-margin;
+				color: $u-search-input-color;
+
+				&--placeholder {
+					color: $u-search-input-placeholder-color;
+				}
+			}
+		}
+
+		&__action {
+			font-size: $u-search-action-font-size;
+			color: $u-search-action-color;
+			width: $u-search-action-width;
+			overflow: hidden;
+			transition-property: width;
+			transition-duration: 0.3s;
+			/* #ifndef APP-NVUE */
+			white-space: nowrap;
+			/* #endif */
+			text-align: center;
+
+			&--active {
+				width: $u-search-action-active-width;
+				margin-left: $u-search-action-margin-left;
 			}
 		}
 	}
-
-	&__action {
-		font-size: $u-search-action-font-size;
-		color: $u-search-action-color;
-		width: $u-search-action-width;
-		overflow: hidden;
-		transition-property: width;
-		transition-duration: 0.3s;
-		/* #ifndef APP-NVUE */
-		white-space: nowrap;
-		/* #endif */
-		text-align: center;
-
-		&--active {
-			width: $u-search-action-active-width;
-			margin-left: $u-search-action-margin-left;
-		}
-	}
-}
 </style>

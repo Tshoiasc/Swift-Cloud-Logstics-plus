@@ -1,13 +1,9 @@
 {
-    "id": "QS-tabs-wxs-list",
-    "name": "QS-tabs-wxs-list Vue版",
-    "version": "3.2",
-    "description": "tabs+list的终极解决方案， 使用wxs实现tab线条效果与下拉刷新，并集成list",
+    "id": "sin-signature",
+    "name": "签名组件-兼容H5、小程序、APP",
+    "version": "1.0.0",
+    "description": "用于uni-app的签名组件，支持H5、小程序、APP，可导出svg矢量图片。",
     "keywords": [
-        "tabs",
-        "list",
-        "选项卡",
-        "分类",
-        "列表"
+        "签名,签字,svg,canvas"
     ]
 }

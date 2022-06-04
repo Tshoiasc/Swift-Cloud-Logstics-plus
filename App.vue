@@ -23,11 +23,6 @@
 			this.globalData.$t = str => this.$t(str)
 			this.globalData.systemInfo = uni.getSystemInfoSync()
 			initApp();
-
-
-
-
-
 			/* 5+环境升级提示 */
 			//app检测更新
 			// #ifdef APP-PLUS

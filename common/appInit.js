@@ -120,6 +120,7 @@ export default async function() {
 			tokenExpired
 		})
 		refreshOrders()
+		refreshRole()
 	})
 
 	uni.addInterceptor('setStorage', {
@@ -265,6 +266,7 @@ export default async function() {
 					tokenExpired
 				})
 				refreshOrders()
+				refreshRole()
 				uni.reLaunch({
 					url: "pages/ucenter/ucenter"
 				})
@@ -428,9 +430,17 @@ export default async function() {
 
 }
 
+function refreshRole() {
+	const send = request('position', 'getPositions', {}, {
+		showLoading: false
+	}).then(res => {
+		console.log("--------------", res)
+		store.commit("user/setRole", res.data)
+	})
+}
+
 function refreshOrders() {
 	let promiseArr = [new Promise(async (resolve, reject) => {
-		console.log("1------------")
 		const send = await request('orders', 'getOrders', {
 			current: 0,
 			page: 20,
@@ -438,13 +448,11 @@ function refreshOrders() {
 		}, {
 			showLoading: false
 		});
-		console.log("1------------")
 		resolve({
 			type: "send",
 			data: send.data
 		})
 	}), new Promise(async (resolve, reject) => {
-		console.log("2------------")
 		const send = await request('orders', 'getOrders', {
 			current: 0,
 			page: 20,
@@ -452,13 +460,11 @@ function refreshOrders() {
 		}, {
 			showLoading: false
 		});
-		console.log("2------------")
 		resolve({
 			type: "receive",
 			data: send.data
 		})
 	}), new Promise(async (resolve, reject) => {
-		console.log("3------------")
 		const send = await request('orders', 'getOrders', {
 			current: 0,
 			page: 20,
@@ -466,7 +472,6 @@ function refreshOrders() {
 		}, {
 			showLoading: false
 		});
-		console.log("3------------")
 		resolve({
 			type: "pay",
 			data: send.data

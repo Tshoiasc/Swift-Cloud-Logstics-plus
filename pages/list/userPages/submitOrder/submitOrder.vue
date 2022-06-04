@@ -162,6 +162,7 @@
 		},
 		methods: {
 			async onPay() {
+				console.log(this.list_data)
 				const res = await request('orders', 'newOrder', this.list_data);
 				console.log(res)
 				if (res.code) {

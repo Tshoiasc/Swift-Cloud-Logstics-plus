@@ -7,39 +7,45 @@
 			<tui-tabs :tabs="tabs" :currentTab="currentTab" @change="change" sliderBgColor="#5483ee"
 				backgroundColor="#f7f7f7" selectedColor="#5483ee" itemWidth="50%" :size="36"></tui-tabs>
 		</view>
-		<view class="" v-if="!list">
-			<tui-no-data imgUrl="/static/images/toast/img_nodata.png">暂无数据</tui-no-data>
-		</view>
+
 
 		<swiper :indicator-dots="false" scroll-x style="height: 100vh;padding-top:72rpx;" :current="currentTab"
-			@change="change" v-else>
+			@change="change">
+			
 			<swiper-item v-for="item in [1,2]">
-				<tui-radio-group @change="changeRatio">
-					<view class="card column" v-for="(data,index) in list" @click="onClickCard(data)">
-						<view class="flex title-box">
-							<view class="name">
-								{{data.name}}
+				<view class=""
+					v-if="!list || !list.length || (item == 1?!list.filter(a=>a.cls =='send').length : !list.filter(a=>a.cls=='receive').length)">
+					<tui-no-data imgUrl="/static/images/toast/img_nodata.png">暂无数据</tui-no-data>
+				</view>
+				<tui-radio-group @change="changeRatio" :value="ratio" v-else>
+					<view class="card column" v-for="(data,index) in list"
+						v-if="item == 1?data.cls == 'send' : data.cls=='receive'">
+						<view class="" @click="onClickCard(data)">
+							<view class="flex title-box">
+								<view class="name">
+									{{data.name}}
+								</view>
+								<view class="phone">
+									{{data.phone}}
+								</view>
 							</view>
-							<view class="phone">
-								{{data.phone}}
+							<view class="address">
+								{{(data.city.text?data.city.text:"") + data.address}}
 							</view>
 						</view>
 
-
-						<view class="address">
-							{{data.address}}
-						</view>
 						<view class="bottom-button flex">
 							<tui-radio color="#5483ee" :value="''+index" :scaleRatio="0.65" borderColor="#999"
 								size="22">
 							</tui-radio>
-							<text class="tui-text" style="margin-left: 12rpx;font-size: 28rpx">设为默认地址</text>
+							<text class="tui-text" style="margin-left: 12rpx;font-size: 28rpx"
+								@click="changeRatio({'detail':{'value':''+index}})">设为默认地址</text>
 							<view class="right flex">
-								<view class="button flex">
+								<view class="button flex" @click="onEdit(data,index)">
 									<tui-icon name="feedback" size="16" color="#aaa"></tui-icon>
 									<text>编辑</text>
 								</view>
-								<view class="button flex" style="margin-left: 20rpx;">
+								<view class="button flex" style="margin-left: 20rpx;" @click="onDelete(data,index)">
 									<tui-icon name="delete" size="16" color="#aaa"></tui-icon>
 									<text>删除</text>
 								</view>
@@ -63,27 +69,7 @@
 					name: "收件人"
 				}],
 				currentTab: 0,
-				list: [{
-					name: "李宝强",
-					phone: "12345678911",
-					address: "太原市",
-					default: ""
-				}, {
-					name: "张玉芬",
-					phone: "12345678911",
-					address: "大连市",
-					default: ""
-				}, {
-					name: "王德贵",
-					phone: "12345678911",
-					address: "深圳市",
-					default: ""
-				}, {
-					name: "陈友财",
-					phone: "12345678911",
-					address: "青岛市",
-					default: ""
-				}],
+				list: [],
 				eventChannel: {},
 				ratio: ""
 			}
@@ -92,12 +78,45 @@
 			// #ifdef APP-PLUS
 			plus.navigator.setStatusBarStyle("dark")
 			// #endif
+			this.list = uni.getStorageSync("offen_address")
 		},
 		onLoad(e) {
 			this.eventChannel = this.getOpenerEventChannel();
 		},
+		onNavigationBarButtonTap(e) {
+			console.log(e)
+			if (e.text == '添加') {
+				//添加地址
+				uni.navigateTo({
+					url: `./edit/edit?type=add&cls=${this.currentTab == 0 ?'send':'receive'}`
+				})
+			}
+		},
 		methods: {
+			onDelete(data, i) {
+				let _this = this
+				uni.showModal({
+					title: "温馨提示",
+					content: "确认要删除吗？",
+					success: (e) => {
+						if (e.confirm === true) {
+
+							_this.list.splice(i, 1)
+							uni.setStorageSync("offen_address", _this.list)
+						}
+					}
+				})
+			},
+			onEdit(e, index) {
+				e.storeIndex = index
+				console.log(e)
+				uni.navigateTo({
+					url: `./edit/edit?type=edit&data=${JSON.stringify(e)}`
+				})
+
+			},
 			changeRatio(e) {
+				console.log(e)
 				this.ratio = e.detail.value
 			},
 			change(e) {

@@ -30,6 +30,12 @@
 	import {
 		request
 	} from '@/common/request'
+	import {
+		mapActions,
+		mapState,
+		mapGetters,
+		mapMutations
+	} from 'vuex';
 	import tuiSegmentedControl from "@/components/thorui/tui-segmented-control/tui-segmented-control"
 	import orderCard from '@/pages/order/order_app/orderCard';
 	// var nfcModule = uni.requireNativePlugin("Am-NFCReaderIDUniPlugin-TestModule")
@@ -46,6 +52,15 @@
 		components: {
 			orderCard,
 			tuiSegmentedControl
+		},
+		computed: {
+			...mapGetters({
+				userInfo: 'user/info',
+				hasLogin: 'user/hasLogin',
+				systemInfo: 'user/systemInfo',
+				role: "user/role",
+				currentRole: "user/currentRole"
+			})
 		},
 		data() {
 			return {
@@ -84,7 +99,6 @@
 		onLoad() {
 			this.current = 1
 			this.getData('no').then(res => {
-				console.log("no", res)
 				if (res.code) {
 					uni.showToast({
 						title: res.msg,
@@ -99,7 +113,6 @@
 				}
 			})
 			this.getData('yes').then(res => {
-				console.log("yes", res)
 				if (res.code) {
 					uni.showToast({
 						title: res.msg,
@@ -120,7 +133,6 @@
 				return;
 			}
 			const subNVue = uni.getSubNVueById('sub_nfc')
-			// this.listenNFCStatus();
 			uni.$on("sub_nfc_show", (e) => {
 				if (e.show) {
 
@@ -134,43 +146,15 @@
 			})
 		},
 		methods: {
-			njsAlertForiOS() {
-				// 导入UIAlertView类
-				var UIAlertView = plus.ios.importClass("UIAlertView");
-				// 创建UIAlertView类的实例对象
-				var view = new UIAlertView();
-				// 设置提示对话上的内容
-				view.initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("自定义标题" // 提示框标题
-					, "使用NJS的原生弹出框，可自定义弹出框的标题、按钮" // 提示框上显示的内容
-					, null // 操作提示框后的通知代理对象，暂不设置
-					, "确定(或者其他字符)" // 提示框上取消按钮的文字
-					, null); // 提示框上其它按钮的文字，设置为null表示不显示
-				// 调用show方法显示提示对话框，在JS中使用()语法调用对象的方法
-				view.show();
-			},
 			async getData(type) {
 				let current = this.list[type].current + 1
 
 				const res = await request('orders', 'staffListOrders', {
 					current: current,
 					page: 20,
-					exist: type == 'yes' ? true : false
+					status: type == 'yes' ? 'send' : 'submit'
 				});
 				return res
-				// const res = await request('orders', 'staffListOrders',{
-				// 	type:
-				// });
-				// if (res.code) {
-				// 	uni.showToast({
-				// 		title: res.msg,
-				// 		icon: "none"
-				// 	})
-				// } else {
-				// 	return 
-				// 	this.no_list = res.data.no.data
-				// 	this.yes_list = res.data.yes.data
-				// 	this.seg = [`已入库(${this.yes_list.length})`, `待入库(${this.no_list.length})`]
-				// }
 			},
 			read(e) {
 
@@ -179,16 +163,12 @@
 					'name': 'yzyzuishuai'
 				}, (res) => {
 					console.log(res)
-					// console.log(res)
 					if (res.type != 1) {
 						plus.nativeUI.alert(res.msg, () => {
 							2
 						}, "提示", "确定")
 						return;
 					}
-					// uni.showLoading({
-					// 	title: "读取成功,正在上传。"
-					// })
 					if (e.bind_card) {
 						if (e.bind_card == res.msg) {
 							plus.nativeUI.alert("核验通过", () => {
@@ -266,9 +246,11 @@
 				})
 			},
 			async bindCard(order_id, card_id) {
-				const res = await request('orders', 'staffBindCard', {
+				const res = await request('orders', 'staffHandle', {
 					order_id,
-					card_id
+					card_id,
+					currentRole: this.currentRole,
+					type: "bind"
 				});
 				return res
 			},

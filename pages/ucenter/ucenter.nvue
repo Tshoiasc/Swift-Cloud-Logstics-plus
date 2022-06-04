@@ -1,74 +1,201 @@
 <template>
-	<scroller ref="root" @scroll="onScroll">
-		<view class="navbar" ref="navbar"
-			:style="`opacity:0;height:${systemInfo.platform == 'ios' ? systemInfo.safeArea.top+44 :systemInfo.safeArea.top+ 48}px;padding-top:${systemInfo.safeArea.top}px`">
+	<scroller @scroll="onScroll" ref="root">
+		<view class="navbar" ref="navbar" id="navbar"
+			:style="`padding-top:${systemInfo.statusBarHeight}px;z-index:99999;`">
+			<view class="bg" ref="navbar_bg" blurEffect="extralight"
+				:style="`opacity:${op};position: absolute;left: 0;right: 0;top: 0;bottom: 0;z-index: -9999;${systemInfo.platform == 'ios'?'':'background:#f6f6f6'};`">
+			</view>
+			<view class="title-box" ref="title-box"
+				style="width: 750rpx;align-items: center;position: absolute;left: 0;right: 0;opacity: 0;">
+				<text style="font-weight: 500;font-size: 32rpx;color: #333;">我的主页</text>
+			</view>
 			<view class="left" @click="toUserInfo"
-				:style="'display: flex;align-items: center;flex-direction: row;height:'+(systemInfo.platform == 'ios' ?44:48)+'px'">
-				<div style="border-radius: 64px;overflow: hidden;margin: 0 24rpx;">
-					<image class="navbar__avatar" mode="scaleToFill"
-						style="border-radius: 64px;margin: 0 12rpx 0 24rpx;width: 64rpx;height: 64rpx;"
-						v-if="userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl"
-						:src="userInfo.avatar_file.tempUrl.download_url">
-					</image>
-				</div>
-
-				<view class="name" v-if="userInfo.nickname||userInfo.username||userInfo.mobile">
-					<text
-						style="font-size: 28rpx; padding: 0 12rpx;">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
+				:style="'display: flex;align-items: center;flex-direction: row;margin-left:24rpx'">
+				<view class="userinfo" id="userinfo" @click="toUserInfo" ref="userinfo" :style="``">
+					<view class="avatar" style="display: flex;align-items: center;justify-content: center;">
+						<view>
+							<!-- 							<view v-if="!hasLogin"
+								style="border-radius:1000rpx;height: 142rpx;width: 142rpx;display: flex;align-items: center;justify-content: center;">
+								<image class="navbar__avatar" mode="scaleToFill"
+									style="border-radius: 1000rpx;width: 72rpx;height: 72rpx;background-color: #fff;box-shadow: 0 0 12rpx #eee;"
+									:src="no_login_avatar">
+								</image>
+							</view> -->
+							<view ref="avatar_box"
+								:style="`width: ${imageParam + 20}px;height:${imageParam+56}px;display: flex;align-items: center;justify-content: center;`">
+								<view class=""
+									style="border-radius: 10000px;overflow: hidden;box-shadow: 0 0 12rpx #eee;">
+									<!-- 									<image ref="avatar_image" class="navbar__avatar" mode="scaleToFill"
+										:style="`border-radius: 1000rpx;width: ${imageParam}px;height: ${imageParam}px;background-color: #fff;`"
+										:src="hasLogin?((userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl)?userInfo.avatar_file.tempUrl.download_url:no_login_avatar):no_login_avatar">
+									</image> -->
+<!-- 									<cloud-image class="navbar__avatar" mode="scaleToFill"
+										style="border-radius: 64px;width: 64rpx;height: 64rpx;" width="64rpx"
+										height="64rpx" v-if="userInfo.avatar_file&&userInfo.avatar_file.url"
+										:src="userInfo.avatar_file.url">
+									</cloud-image> -->
+									<image ref="avatar_image" class="navbar__avatar" mode="scaleToFill"
+										:style="`border-radius: 1000rpx;width: ${imageParam}px;height: ${imageParam}px;background-color: #fff;`"
+										:src="(hasLogin && (userInfo.avatar_file&&userInfo.avatar_file.url))?avatar_file:no_login_avatar">
+									</image>
+								</view>
+							</view>
+						</view>
+					</view>
 				</view>
 			</view>
+			<view ref="buttons"
+				:style="`height:${(imageParam+56)}px;top:${systemInfo.statusBarHeight}px;position: absolute;right: 24rpx;display: flex;flex-direction: row;align-items: center;`">
+				<view class="sign" ref="sign" @click="signIn" v-if="hasLogin"
+					:style="`display: flex;align-items: center;justify-content: center;background-image:linear-gradient(to top, #3046ed, #3671fa);border-radius: 96rpx;box-shadow: 0 0 12rpx rgba(211,211,211,0.5);height: 46rpx;width: ${imageParam}px;`">
+					<u-loading-icon mode="circle" v-if="signing" color="#fff" size="16" inactiveColor="#aaaaaa">
+					</u-loading-icon>
 
+					<text style="color: #fff;font-size: 20rpx;" v-else>签到</text>
+				</view>
+				<uni-icons type="gear" color="#555" size="24" style="margin-left: 16rpx;"
+					@click="navigateTo('/pages/ucenter/settings/settings')"></uni-icons>
+				<!-- 				<u-icon name="setting" color="#999" size="24" style="margin-left: 16rpx;"
+					@click="navigateTo('/pages/ucenter/settings/settings')"></u-icon> -->
+				<!-- <u-icon name="chat" color="#999" size="24" style="margin-left: 16rpx;"></u-icon> -->
+			</view>
 
 		</view>
+
 		<view class="head_bg"
-			style="position: absolute;top: 0;left: 0;right: 0;height: 560rpx;background-image: linear-gradient(to bottom, rbga(	175,238,238,.8)	#E1FFFF,#f7f7f7);">
+			:style="`position: absolute;top: 0;left: 0;right: 0;height: ${height}px;z-index: 999999;`">
+			<image src="/static/images/head_bg-r.png" mode="scaleToFill" :style="`width: 750rpx;height: ${height}px;`">
+			</image>
+		</view>
+		<uni-sign-in ref="signIn"></uni-sign-in>
+		<view class="container" :style="`padding-top:${systemInfo.statusBarHeight}px`">
+			<view class="usr_info" :style="`margin-left: ${imageParam + 12}px;height:${imageParam + 56}px;`">
+				<view v-if="!hasLogin" style="margin-left: 20rpx;">
+					<text style="font-size:32rpx;font-weight: 500;color: #555;">点击这里登陆</text>
+				</view>
+				<view style="margin-left: 12rpx;" v-else>
+					<view class="name" v-if="userInfo.nickname||userInfo.username||userInfo.mobile"
+						style="display: flex;flex-direction: column; margin: 0 12rpx;">
+						<view style="display: flex;flex-direction: row;align-items: center;">
+							<text
+								style="font-size:38rpx;font-weight: 500;">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
+							<view class="" style="margin-left: 12rpx;">
+								<!-- 								<tui-icon name="attestation" size="17" color="#fea608">
+								</tui-icon> -->
+								<u-icon name="level" color="#fea608" size="18"
+									v-if="role && role.list && role.list.length"></u-icon>
+							</view>
+						</view>
+						<view
+							style="position:relative;display: flex;align-items: center;flex-direction: row;margin-top: 6rpx;">
+							<text
+								style="font-size: 20rpx;color:#7993eb;left: 0;background-color: rgba(215,233,255,0.4);border-radius: 24rpx;padding-left: 12rpx;padding-right: 12rpx;padding-top: 6rpx;padding-bottom: 6rpx;">{{(role && role.list && role.list[0] &&  role.list[0].department &&  role.list[0].department[0] &&  role.list[0].department[0].name) || "普通用户"}}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="blue-card" id="buttons1">
+				<image class="card_bg"
+					src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/%E8%93%9D%E8%89%B2%E7%A7%91%E5%B9%BBAI%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%A4%A7%E8%B5%9B%E5%AE%A3%E4%BC%A0%20(1).png?sign=f02c2e92b98e73bc9f82c0d4087204d1&t=1651086392"
+					mode="aspectFill" style="opacity: .9;"></image>
+				<view class="line">
+					<text class="value">
+						{{count}}
+					</text>
+					<text class="title">
+						处理单数
+					</text>
+				</view>
+				<view class="line">
+					<text class="value">
+						{{count}}
+					</text>
+					<text class="title">
+						日均单量
+					</text>
+				</view>
+				<view class="line">
+					<text class="value">
+						{{score}}
+					</text>
+					<text class="title">
+						积分
+					</text>
+				</view>
+			</view>
+			<view class="button-list-under" v-for="(list,i) in button_list.slice(0,1)"
+				:style="`background-color: #ffffff;border-top-left-radius:12rpx;border-top-right-radius:12rpx`">
+				<view class="title-box" v-if="list.title">
+					<text class="title">{{list.title}}</text>
+				</view>
+				<u-grid :border="false" :col="list.col">
+					<u-grid-item v-for="(item,index) in list.data" :key="index" @click="item.event()">
+						<view class="icon-box"
+							:style="'height:96rpx;align-items:center;justify-content:center;display:flex;padding-top:24rpx'"
+							@click="item.event()">
+							<u-icon :name="item.icon" :size="32" @click="item.event()" v-if="item.icon">
+							</u-icon>
+							<image class="image" style="height: 64rpx;" :src="item.image" @click="item.event()"
+								mode="heightFix" v-else-if="item.image"></image>
+						</view>
+
+						<text class="grid-text"
+							style="font-size: 26rpx;color: #333;margin-top: 16rpx;">{{item.title}}</text>
+						<view class=""
+							style="position: absolute;right: 3rpx;top: 36rpx;bottom: 36rpx;width: 3rpx;background-color: #f8f8f8;border-radius: 100rpx;"
+							v-if="index != list.data.length  - 1">
+
+						</view>
+					</u-grid-item>
+				</u-grid>
+			</view>
+			<view class="swiper">
+				<u-swiper :list="list1" @change="change" @click="click" height="124rpx" radius="16rpx" :circular="true"
+					:indicator="true" :indicatorMode="'line'"></u-swiper>
+			</view>
+			<view class="button-list-under" v-for="(list,i) in button_list.slice(1)"
+				:style="`background-color: #ffffff;${i==0?'border-bottom: 1rpx solid #eee;':''}`">
+				<view class="title-box" v-if="list.title">
+					<text class="title">{{list.title}}</text>
+				</view>
+				<u-grid :border="false" :col="list.col">
+					<u-grid-item v-for="(item,index) in list.data" :key="index" @click="item.event()">
+						<view class="icon-box"
+							:style="'height:96rpx;align-items:center;justify-content:center;display:flex;padding-top:24rpx'"
+							@click="item.event()">
+							<u-icon :name="item.icon" :size="24" @click="item.event()" v-if="item.icon">
+							</u-icon>
+							<image class="image" :src="item.image" @click="item.event()" mode="heightFix"
+								v-else-if="item.image"></image>
+						</view>
+
+						<text class="grid-text"
+							style="font-size: 26rpx;color: #333;margin-top: 16rpx;">{{item.title}}</text>
+					</u-grid-item>
+				</u-grid>
+			</view>
+			<!-- 			<uni-list class="center-list" v-for="(sublist , index) in ucenterList" :key="index">
+				<uni-list-item v-for="(item,i) in sublist" :title="item.title" link :rightText="item.rightText" :key="i"
+					:clickable="true" :to="item.to" @click="ucenterListClick(item)" :show-extra-icon="true"
+					style="height: 84rpx;" :extraIcon="{type:item.icon,color:'#333',size:'24'}">
+					<template v-slot:footer>
+						<view v-if="item.showBadge" class="item-footer">
+							<text class="item-footer-text" style="font-size: 32rpx;">{{item.rightText}}</text>
+							<view class="item-footer-badge"></view>
+						</view>
+					</template>
+				</uni-list-item>
+			</uni-list> -->
+
 
 		</view>
-		<view class="container"
-			:style="`padding-top:${systemInfo.platform == 'ios' ? systemInfo.safeArea.top+22 :systemInfo.safeArea.top+ 24}px`">
-
-			<view class="userinfo" @click="toUserInfo">
-				<view class="avatar">
-					<image class="navbar__avatar" mode="scaleToFill"
-						style="border-radius: 128px;margin: 0 12rpx 0 24rpx;width: 96rpx;height:96rpx;"
-						v-if="userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl"
-						:src="userInfo.avatar_file.tempUrl.download_url">
-					</image>
-					<view class=""
-						style="position: absolute;bottom:6rpx;right:12rpx;background-color: #5184fa;border-radius: 64rpx;height: 32rpx;width: 32rpx;display: flex;align-items: center;justify-content: center;">
-						<text style="color: white;font-size: 24rpx;font-weight: bold;line-height: 24rpx;">v</text>
-					</view>
-				</view>
-
-				<view class="name" v-if="userInfo.nickname||userInfo.username||userInfo.mobile"
-					style="display: flex;flex-direction: column; margin: 0 12rpx;">
-					<view class="">
-						<text
-							style="font-size:42rpx;font-weight: 500;">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
-
-					</view>
-
-					<view class=""
-						style="position:relative;display: flex;align-items: center;flex-direction: row;margin-top: 6rpx;">
-						<text
-							style="font-size: 20rpx;color:#9eb8eb;left: 0;background-color: #d7e9ff;border-radius: 24rpx;padding-left: 12rpx;padding-right: 12rpx;padding-top: 2rpx;padding-bottom: 2rpx;">太阳路菜鸟驿站</text>
-					</view>
-				</view>
-				<view class="right"
-					style="position: absolute;right: 36rpx;display: flex;align-items: center;justify-content: center;top: 0;bottom: 0;">
-					<view class="flex">
-						<text style="font-size: 26rpx;font-weight: 400;color: #999;">主页</text>
-						<tui-icon name="arrowright" size="18" style="margin-left: 4rpx;"></tui-icon>
-					</view>
-				</view>
-			</view>
-			<view class="" style="height: 58px;" v-for="index of [1,2,3,4,5,6,7,8,9,7,5,4,5,5,1,5,5,5,5,5]">
-				fdsaf
-			</view>
+		<view class="card_list" style="height: 1000px;">
 
 		</view>
 
 	</scroller>
+
+
 </template>
 
 <script>
@@ -77,75 +204,483 @@
 		mapMutations
 	} from 'vuex';
 	const Binding = uni.requireNativePlugin('bindingx');
+	const url = "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/my/";
 	export default {
 		computed: {
 			...mapGetters({
 				userInfo: 'user/info',
 				hasLogin: 'user/hasLogin',
-				systemInfo: 'user/systemInfo',
-				orders: "user/orders"
+				orders: "user/orders",
+				role: "user/role",
+				systemInfo: "user/systemInfo",
+				currentRole: "user/currentRole"
 			})
 		},
 		data() {
 			return {
-				bindingXItem: {}
+				list1: [
+					'https://cdn.uviewui.com/uview/swiper/swiper1.png',
+					'https://cdn.uviewui.com/uview/swiper/swiper2.png',
+					'https://cdn.uviewui.com/uview/swiper/swiper3.png',
+				],
+				ucenterList: [
+
+					[{
+						"title": "反馈",
+						"to": '/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback',
+						"icon": "help"
+					}, {
+						"title": "我的设置",
+						"to": '/pages/ucenter/settings/settings',
+						"icon": "gear"
+					}, {
+						"title": "关于我们",
+						"to": '/pages/ucenter/about/about',
+						"icon": "info"
+					}, {
+						"title": "活动",
+						"icon": "gift"
+					}]
+				],
+				score: 0,
+				button_list: [{
+						data: [{
+							image: url + "dingdan.png",
+							title: "我的订单",
+							event: () => uni.switchTab({
+								url: "/pages/order/order"
+							})
+						}, {
+							image: url + "dengji.png",
+							title: "我要反馈",
+							event: () => uni.navigateTo({
+								url: "/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback"
+							})
+						}, {
+
+							image: url + "聊吧.png",
+							title: "联系客服",
+							event: () => {
+								plus.device.dial("13425160821", false);
+							}
+						}]
+					},
+					{
+						title: "常用功能",
+						col: 4,
+						data: [{
+							image: url + "bianqian.png",
+							title: "常用地址",
+							event: () => {
+								uni.navigateTo({
+									url: "/pages/list/userPages/offenAddress/offenAddress"
+								})
+							}
+
+						}, {
+							image: url + "fenxiang.png",
+							title: "分享程序",
+							event: () => {
+								plus.share.sendWithSystem({
+									type: 'text',
+									content: '快来使用云极速递吧',
+									href: 'http://www.yunjisudi.com/'
+								}, (e) => {
+									console.log(e), (e) => {
+										console.log(e)
+									}
+								}, (e) => {
+									console.log(e)
+								})
+							}
+						}, {
+							image: url + "gerenziliao.png",
+							title: "个人资料",
+							event: () => {
+								this.toUserInfo()
+							}
+						}, {
+							image: url + "qiyeguanli.png",
+							title: "部门管理",
+							event: () => {
+								uni.switchTab({
+									url: "/pages/app/app"
+								})
+							}
+						}]
+					}, {
+						title: "其他信息",
+						col: 4,
+						data: [{
+							image: url + "入职.png",
+							title: "加入云极"
+						}, {
+							image: url + "合作.png",
+							title: "合作洽谈"
+						}, {
+							image: url + "gonggao.png",
+							title: "最新公告",
+							event: () => {
+								uni.showToast({
+									title: "暂无公告",
+									icon: "none"
+								})
+							}
+						}, {
+							image: url + "房源.png",
+							title: "关于我们",
+							event: () => uni.navigateTo({
+								url: "/pages/ucenter/about/about"
+							})
+						}, {
+							image: url + "shezhi.png",
+							title: "系统设置",
+							event: () => uni.navigateTo({
+								url: "/pages/ucenter/settings/settings"
+							})
+						}]
+					}
+				],
+				signing: false,
+				imageParam: 54,
+				bindingXItem: {},
+				no_login_avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPuLbQLZqm9I5UE4oF4d1d21dX2AbEYsvM0Q&usqp=CAU",
+				op: 0.01,
+				mt: 12,
+				count: 0,
+				image_url: "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/my/",
+				avatar_file: "",
+				height: 250
 			}
 		},
-		onReady() {
-			let root = this.$refs.root.ref
-			let navbar = this.$refs.navbar.ref
+		onLoad() {
+			//#ifdef APP-PLUS
+			// this.ucenterList[this.ucenterList.length - 2].unshift({
+			// 	title: "检查更新", // this.this.$t('mine.checkUpdate')"检查更新"
+			// 	rightText: this.appVersion.version + '-' + this.appVersion.versionCode,
+			// 	event: 'checkVersion',
+			// 	icon: 'loop',
+			// 	showBadge: this.appVersion.hasNew
+			// })
+			// plus.navigator.setStatusBarStyle("dark")
+			//#endif
+		},
+		onShow() {
+			plus.navigator.setStatusBarStyle("dark")
+			let score = this.getScore()
+		},
+		onPageScroll(e) {},
+		async onReady() {
+
+
 			let that = this
-			let navbarHeight = that.systemInfo.safeArea.top + (that.systemInfo.platform == 'ios' ? 44 : 48)
-			this.bindingXItem = Binding.bind({
-				anchor: root,
-				eventType: 'scroll',
-				props: [{
-					element: navbar,
-					property: 'opacity',
-					expression: `y<=${navbarHeight}?y/${navbarHeight}:1`
-				}]
-			}, function(res) {
-				if (res.state === 'exit') {
-					Binding.unbind({
-						token: this.bindingXItem.token,
-						eventType: 'scroll'
+			setTimeout(() => {
+				uni.createSelectorQuery().select("#buttons1").boundingClientRect(rect => {
+					that.height = rect.top + rect.height / 2
+					console.log(that.height, rect)
+				}).exec()
+			}, 200)
+			let root = this.$refs.root.ref
+			let navbar_bg = this.$refs.navbar_bg.ref
+			let navbar = this.$refs.navbar.ref
+			let avatar_image = this.$refs.avatar_image.ref
+			let avatar_box = this.$refs.avatar_box.ref
+			let userinfo = this.$refs.userinfo.ref
+			let navbarHeight = that.systemInfo.statusBarHeight + (that.systemInfo.platform == 'ios' ? 44 : 48)
+			let buttons = this.$refs.buttons.ref
+			let title = this.$refs['title-box'].ref
+			let sign = this.$refs.sign.ref
+			setTimeout(() => {
+				if (this.userInfo && this.userInfo.avatar_file && this.userInfo.avatar_file.url) {
+					uniCloud.getTempFileURL({
+						fileList: [this.userInfo.avatar_file.url]
+					}).then(res => {
+						// console.log(res);
+						this.avatar_file = res.fileList[0].tempFileURL
 					})
 				}
-			});
+			}, 200)
+
+			console.log("height")
+			let realHeight = await new Promise((resolve, reject) => {
+				uni.createSelectorQuery().select("#navbar").boundingClientRect(e => {
+					console.log(e)
+					resolve(e.height)
+				}).exec()
+			})
+			console.log("height" + realHeight)
+			let bl = navbarHeight / realHeight
+			bl = bl * 0.9
+			this.bl = bl
+			console.log(bl)
+			this.op = 0
+			this.bindingXItem = Binding.bind({
+					anchor: root,
+					eventType: 'scroll',
+					props: [{
+							element: navbar_bg,
+							property: 'opacity',
+							expression: `y<=${navbarHeight}?(y<0?0:(y/${navbarHeight})):1`
+						}, {
+							element: title,
+							property: 'opacity',
+							expression: `y<=${navbarHeight * 0.75}?0:1`
+						}, {
+							element: avatar_image,
+							property: 'height',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam}):${this.imageParam}*${bl}`
+						},
+						// {
+						// 	element: userinfo,
+						// 	property: 'transform.scaleY',
+						// 	expression: `y<=${navbarHeight}?(y<0?0:(1 - (y/${navbarHeight})*0.4)):0.6`
+						// },
+						{
+							element: avatar_image,
+							property: 'width',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam}):${this.imageParam}*${bl}`
+						}, {
+							element: avatar_box,
+							property: 'height',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam+56}):${this.imageParam+56}*${bl}`
+						}, {
+
+							element: buttons,
+							property: 'height',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam+56}):${this.imageParam+56} * ${bl}`
+						},
+
+						{
+							element: avatar_box,
+							property: 'width',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam + 20}):${this.imageParam + 20}*${bl}`
+						}, {
+							element: sign,
+							property: 'width',
+							expression: `y<=${navbarHeight}?((1 - ((y<0?0:y)/${navbarHeight})*${1-bl})*${this.imageParam}):${this.imageParam}*${bl}`
+						},
+						// {
+						// 	element: userinfo,
+						// 	property: 'transform.translateY',
+						// 	expression: `y<=${navbarHeight} && y >= 0?y/${-navbarHeight/this.mt}:${-this.mt}`
+						// },
+						// {
+						// 	element: userinfo,
+						// 	property: 'transform.translateX',
+						// 	expression: `y<=${navbarHeight}?(y<0?0:(y/${-navbarHeight/2})):-2`
+						// }, 
+						{
+							element: navbar,
+							property: 'height',
+							expression: `y<=${navbarHeight}?(${realHeight} - (${realHeight - navbarHeight}* (y<0?0:y)/${navbarHeight} )):${navbarHeight}`
+						}, {
+							element: userinfo,
+							property: 'transform.translateY',
+							expression: `y<0?0-y/2:0`
+						}, {
+							element: navbar_bg,
+							property: 'height',
+							expression: `y<=${navbarHeight}?(${realHeight} - (${realHeight - navbarHeight}* (y<0?0:y)/${navbarHeight} )):${navbarHeight}`
+						}
+					]
+				},
+				function(res) {
+					if (res.state === 'exit') {
+						Binding.unbind({
+							token: this.bindingXItem.token,
+							eventType: 'scroll'
+						})
+					}
+
+				});
+
+		},
+		watch: {
+			userInfo: function(e) {
+				uniCloud.getTempFileURL({
+					fileList: [e.avatar_file.url]
+				}).then(res => {
+					// console.log(res);
+					this.avatar_file = res.fileList[0].tempFileURL
+				})
+			}
 		},
 		methods: {
-			toUserInfo() {
+			getScore() {
+				if (!this.hasLogin) {
+					return;
+				}
+				let that = this
+				if (!this.userInfo) this.score = 0
+				// uni.showLoading({
+				// 	mask: true
+				// })
+				const db = uniCloud.database()
+				db.collection("uni-id-scores")
+					.where('"user_id" == $env.uid')
+					.field('score,balance')
+					.orderBy("create_date", "desc")
+					.limit(1)
+					.get()
+					.then((res) => {
+						console.log(res);
+						const data = res.result.data[0];
+						// let msg = '';
+						// msg = data ? (this.$t('mine.currentScore') + data.balance) : "没有积分";
+						console.log(data)
+						that.score = data.balance
+					}).finally(() => {
+						// uni.hideLoading()
+					})
+				db.collection("uni-id-base-order")
+					.where('"bind_info.binder.check.uid" == $env.uid').count().then(res => {
+						that.count = res.result.total
+					})
+			},
+			signIn() {
+				if (this.signing) return;
+				this.signing = true
+				this.$refs.signIn.open((e) => {
+					if (!(e === true)) {
+						let str = e.toString()
+						str = str.replaceAll("Error: ", "")
+						uni.showToast({
+							icon: "none",
+							title: str
+						})
+					}
+					this.signing = false
+					console.log("签到完成")
+				}, true)
+			},
+			navigateTo(url) {
 				uni.navigateTo({
-					url: '/pages/ucenter/settings/settings'
+					url
 				})
 			},
-			onScroll(e) {
-				// console.log(e)
-			}
+			toUserInfo() {
+				uni.navigateTo({
+					url: '/pages/ucenter/userinfo/userinfo'
+				})
+			},
+			onScroll(e) {}
 		}
 	}
 </script>
-
 <style lang="scss" scoped>
+	.usr_info {
+		justify-content: center;
+		padding-left: 24rpx;
+	}
+
 	.navbar {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
-		background-color: #fff;
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		width: 750rpx;
+
+		// opacity: 0;
+		.bg {
+			border-bottom: 1rpx solid #eee;
+		}
+	}
+
+	.button-list-under {
+
+		margin: 8rpx 24rpx;
+		// border-bottom: 1rpx solid #eee;
+		padding-bottom: 24rpx;
+
+		.title-box {
+			// padding-left: 24rpx;
+			// padding-right: 24rpx;
+			padding-bottom: 12rpx;
+			padding-top: 12rpx;
+
+			.title {
+				font-size: 30rpx;
+				font-weight: bold;
+				color: #333
+			}
+
+		}
+
+		.image {
+			height: 56rpx;
+			border-radius: 70rpx;
+		}
 	}
 
 	.userinfo {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		height: 200rpx;
-		// background-color: #000;
 	}
 
 	.flex {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		position: relative;
+
+		.right {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+		}
+	}
+
+	.blue-card {
+		width: 702rpx;
+		margin: 0 24rpx;
+		margin-top: -12rpx;
+		height: 164rpx;
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+
+		.card_bg {
+			background-color: #ffffff;
+			border-radius: 12rpx;
+			box-shadow: 0 0 4rpx rgba(83, 123, 247, .4);
+			width: 690rpx;
+			height: 152rpx;
+			position: absolute;
+		}
+
+		.line {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 234rpx;
+			flex-direction: column;
+
+			.title {
+				font-size: 26rpx;
+				color: rgba(255, 255, 255, .8);
+				// font-weight: 300;
+				margin-top: 6rpx;
+			}
+
+			.value {
+				font-size: 38rpx;
+				color: #fff;
+				font-weight: 700;
+			}
+		}
+	}
+
+	.swiper {
+		padding-left: 48rpx;
+		padding-right: 48rpx;
+		margin-top: 12rpx;
+		margin-bottom: 12rpx;
 	}
 </style>

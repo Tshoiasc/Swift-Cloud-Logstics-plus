@@ -1,6 +1,6 @@
 <template>
 	<page-meta style="overflow: hidden;">
-		
+
 	</page-meta>
 	<view class="container" :style="{ paddingTop : systemInfo.safeArea.top + 'px'}">
 		<!-- #ifndef MP -->
@@ -33,28 +33,29 @@
 						</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell  :hover="false" :lineLeft="false" backgroundColor="transparent"  v-if="captchaBase64" style="display: flex; align-items: center;">
+				<tui-list-cell :hover="false" :lineLeft="false" backgroundColor="transparent" v-if="captchaBase64"
+					style="display: flex; align-items: center;">
 					<view class="tui-cell-input">
 						<tui-icon name="mobile" color="#6d7a87" :size="20"></tui-icon>
-					
+
 						<input :adjust-position="false" v-model="captcha" placeholder="请输入验证码"
 							placeholder-class="tui-phcolor" type="text" maxlength="11" />
 						<view class="tui-icon-close" v-show="captcha" @tap="clearInput(3)">
 							<tui-icon name="close-fill" :size="16" color="#bfbfbf"></tui-icon>
 						</view>
 					</view>
-						<image class="captcha-img" @click="createCaptcha" :src="captchaBase64" mode="widthFix"></image>
+					<image class="captcha-img" @click="createCaptcha" :src="captchaBase64" mode="widthFix"></image>
 				</tui-list-cell>
 			</view>
 			<view class="tui-cell-text">
-<!-- 				<view class="tui-color-primary" hover-class="tui-opcity" :hover-stay-time="150" @tap="toRetrievePwd">
+				<!-- 				<view class="tui-color-primary" hover-class="tui-opcity" :hover-stay-time="150" @tap="toRetrievePwd">
 					忘记密码？</view> -->
 				<view hover-class="tui-opcity" :hover-stay-time="150" style="margin-top: 12rpx;">
 					没有账号？
 					<text class="tui-color-primary" @tap="toRegister">注册</text>
 				</view>
 			</view>
-<!-- 			<view class="agreement">
+			<!-- 			<view class="agreement">
 				<uni-agreements @setAgree="agree = $event" style="font-size: 24rpx;color: $uni-text-color-grey;"></uni-agreements>
 			</view> -->
 			<view class="tui-btn-box">
@@ -85,8 +86,8 @@
 
 
 
-
-		<!-- 		<view class="content">
+		<!-- 
+				<view class="content">
 			<text class="title">{{$t('pwdLogin.pwdLogin')}}</text>
 			<input class="input-box" :inputBorder="false" v-model="username" :placeholder="$t('pwdLogin.placeholder')"/>
 			<input type="password" class="input-box" :inputBorder="false" v-model="password" :placeholder="$t('pwdLogin.passwordPlaceholder')"/>
@@ -100,9 +101,9 @@
 			<view class="auth-box">
 				<text class="link" @click="toRetrievePwd">{{$t('pwdLogin.forgetPassword')}}</text>
 				<text class="link" @click="toRegister">{{$t('pwdLogin.register')}}</text>
-			</view>
-			<uni-quick-login :agree="agree" ref="uniQuickLogin"></uni-quick-login>
-		</view> -->
+			</view> -->
+		<uni-quick-login :agree="agree" ref="uniQuickLogin"></uni-quick-login>
+	</view>
 	</view>
 
 </template>
@@ -118,7 +119,7 @@
 				"agree": true,
 				"captchaBase64": "",
 				"captcha": "",
-				systemInfo:{}
+				systemInfo: {}
 			}
 		},
 		computed: {
@@ -132,25 +133,25 @@
 				return /^1\d{10}$/.test(this.phone);
 			},
 		},
-		onLoad(){
+		onLoad() {
 			this.systemInfo = uni.getSystemInfoSync()
 		},
 		methods: {
-			clearInput:function(e){
-				switch(e){
+			clearInput: function(e) {
+				switch (e) {
 					case 1:
 						this.username = "";
 						break;
 					case 2:
-					this.password = "";
-					break;
+						this.password = "";
+						break;
 					case 3:
-					this.captcha = ""
+						this.captcha = ""
 				}
 			},
-			back:function(){
+			back: function() {
 				uni.navigateBack({
-					
+
 				})
 			},
 			// 页面跳转，找回密码
@@ -171,8 +172,8 @@
 					});
 				}
 				uni.showLoading({
-					title:"正在登陆",
-					mask:true
+					title: "正在登陆",
+					mask: true
 				})
 				// 下边是可以登录
 				uniCloud.callFunction({
@@ -316,6 +317,7 @@
 				align-items: center;
 				justify-content: space-between;
 				margin-left: 24rpx;
+
 				.tui-color-primary {
 					color: $uni-color-primary;
 				}
@@ -418,6 +420,5 @@
 		width: 220rpx;
 	}
 
-	.captcha {
-	}
+	.captcha {}
 </style>

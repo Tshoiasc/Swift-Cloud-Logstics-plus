@@ -1,18 +1,35 @@
 <template>
 	<view class="container" :style="'width: 750rpx;'">
 		<view>
-			<u-loading-page :loading="loading" loading-text="加载中..."></u-loading-page>
+			<u-loading-page :loading="loading" loading-text="加载中..." image="/static/app-plus/other/loading.gif">
+			</u-loading-page>
 		</view>
+
+		<view class="all" v-if="!currentRole || !currentRole._id"
+			:style="`position:fixed;top: ${systemInfo.statusBarHeight + 44}px;right: 0;left: 0;bottom: 0;z-index: 99999;background-color: #f7f7f7;`">
+			<u-list @scrolltolower="scrolltolower" style="height: 920rpx;">
+				<u-list-item v-for="(item, index) in role.list" :key="index" style="padding-top: 4px;">
+					<u-cell :title="`${item.department && item.department[0] && item.department[0].name}`"
+						:value="item.position && item.position[0] && item.position[0].role_name" :clickable="true"
+						@click="handlePosition(item)">
+						<u-avatar slot="icon" shape="square" size="36" :src="getAvatar(item)"
+							customStyle="margin: -3px 5px -3px 0;border-radius:1000rpx;"></u-avatar>
+					</u-cell>
+				</u-list-item>
+			</u-list>
+		</view>
+
 		<view :style="{height:(systemInfo.statusBarHeight + 48)+'px'}"></view>
 		<u-notice-bar :text="text1" mode="link" speed="65" url="/pages/componentsB/tag/tag"></u-notice-bar>
 		<view style="display: flex;align-items: center;margin-top: 24rpx;">
 			<u-swiper :list="list1" @change="change" @click="click" style="width: 702rpx;"></u-swiper>
 		</view>
-		<view class="part" style="margin-top: 18rpx;" v-for="(list_item,index) in list">
+		<view class="part" style="margin-top: 18rpx;" v-for="(list_item,index) in doit(list)">
 			<text class="title">{{list_item.title}}</text>
 			<u-grid :border="false" col="4">
 				<u-grid-item v-for="(listItem,listIndex) in list_item.data" :key="listIndex" style="height: 212rpx;"
-					@click="onClick(listItem,listIndex)">
+					@click="onClick(listItem,listIndex)"
+					v-if="permissions && permissions.indexOf(listItem.permission) != -1">
 					<image :src="'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/' + listItem.img"
 						mode="heightFix" style="height: 98rpx;" hover-class="hover-image" hover-stay-time="70"></image>
 					<!-- <u-icon :customStyle="{paddingTop:20+'rpx'}" :name="listItem.name" :size="22"></u-icon> -->
@@ -20,134 +37,139 @@
 				</u-grid-item>
 			</u-grid>
 		</view>
-
-
 	</view>
 </template>
-
 <script>
 	import thorui from '@/components/common/tui-clipboard/tui-clipboard.js';
 	import {
 		nfcRead
 	} from './nfc_for_mp.js'
 	import {
+		request
+	} from '@/common/request.js'
+	import {
 		mapActions,
-		mapState
+		mapState,
+		mapGetters,
+		mapMutations
 	} from 'vuex';
 	export default {
-		data() {
+		computed: {
+			...mapGetters({
+				userInfo: 'user/info',
+				hasLogin: 'user/hasLogin',
+				systemInfo: 'user/systemInfo',
+				role: "user/role",
+				currentRole: "user/currentRole",
+				systemInfo: "user/systemInfo"
+			})
+		},
 
+		data() {
 			return {
 				loading: true,
 				list1: [
 					'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/%E8%93%9D%E8%89%B2%E7%A7%91%E6%8A%80%E6%97%B6%E5%B0%9A%E4%BC%81%E4%B8%9A%E5%B9%B4%E4%BC%9A%E5%B9%B4%E7%BB%88%E7%9B%9B%E5%85%B8%20(1).png?sign=7ad4828b972bbcd5d92dfc5806c785d9&t=1650641935',
-
 				],
 				text1: '各驿站：因疫情今日停止送货，望周知',
 				systemInfo: {},
 				list: [{
-					title: "机构管理",
-					data: [{
-							title: '入库管理',
-							img: "入库单.png",
-							url: "./apps/pushInStore/pushInStore"
-						}, {
-							title: '验视处理',
-							img: "库存单.png"
-						}, {
-							title: '员工管理',
-							img: "人员管理.png"
-						},
-						{
-							title: '订单管理',
-							img: "问卷计划.png"
-						},
-						{
-							title: '审批处理',
-							img: "行政组织.png"
-						},
-						{
-							title: '售后处理',
-							img: "员工心声.png"
-						},
-						{
-							title: '数据分析',
-							img: "供应商数据分析.png"
-						}, {
-							title: '常规设置',
-							img: "通用角色.png"
-						}
-					]
-				}, {
-					title: "下属机构管理",
-					data: [
+						title: '入库管理',
+						img: "入库单.png",
+						url: "./apps/pushInStore/pushInStore",
+						permission: "in_store"
+					}, {
+						title: '验视处理',
+						url: "./apps/verifyExpress/verifyExpress",
+						img: "库存单.png",
+						permission: "look_store"
+					}, {
+						title: '员工管理',
+						img: "人员管理.png",
+						permission: "staff"
+					},
 
-						{
-							title: '审批处理',
-							img: "行政组织.png"
-						},
+					{
+						title: '派件管理',
+						img: "送货单.png",
+						url: "./apps/deliverExpress/deliverExpress",
+						permission: "deliver"
+					},
+					{
+						title: '售后处理',
+						img: "员工心声.png",
+						permission: "after_sell"
+					}, {
+						title: '订单管理',
+						img: "问卷计划.png",
+						permission: "orders"
+					},
+					{
+						title: '数据分析',
+						img: "供应商数据分析.png",
+						permission: "data"
+					}, {
+						title: '常规设置',
+						img: "通用角色.png",
+						permission: "setting"
+					}
 
+					// , {
+					// 	title: '数据分析',
+					// 	img: "供应商数据分析.png",
+					// 	permission: "under_data"
+					// },
 
-						{
-							title: '数据分析',
-							img: "供应商数据分析.png"
-						},
+					// {
+					// 	title: '员工投诉',
+					// 	img: "问卷方案.png",
+					// 	permission: "under_feedback"
 
-						{
-							title: '员工投诉',
-							img: "问卷方案.png"
-						}
-					]
-				}],
-				dataList: [{
-					name: "people",
-					title: "员工管理",
-					img: "上门送货服务.png"
-				}, {
-					name: "order",
-					title: "订单管理",
-					img: "配送快递服务.png"
-				}, {
-					name: "category",
-					title: "审批管理",
-					img: "快递员.png"
-				}, {
-					name: "shop",
-					title: "站点管理",
-					img: "发货包裹.png"
-				}, {
-					name: "kefu",
-					title: "售后处理",
-					img: "仓库存货.png"
-				}, {
-					name: "kefu",
-					title: "售后处理",
-					img: "安排送货时间.png"
-				}],
+					// }
+				],
 				theme: "dark",
-				currentGroup: ""
+				currentGroup: "",
+				permissions: []
 			};
 		},
 		onShow() {
 			// #ifdef APP-PLUS
 			plus.navigator.setStatusBarStyle("dark")
 			// #endif
+			console.log(this.currentRole)
+
 		},
 		onLoad() {
 			let that = this
+			var tn = plus.webview.currentWebview();
+			var st = tn.getStyle().titleNView;
+			this.refreshRole()
+			// if (!this.currentRole || !this.currentRole._id) {
+			// 	that.$store.commit("user/setCurrentRole", this.role[0]);
+			// 	console.log(this.role)
+			// }
+			try {
+				st.subtitleText = this.currentRole.department[0].name + "-"
+			} catch (e) {
+				st.subtitleText = "未知组织" + "-"
+			}
+			try {
+				st.subtitleText = st.subtitleText + this.currentRole.position[0].role_name
+			} catch (e) {
+				st.subtitleText = st.subtitleText + "未知职位"
+			}
+
+			try {
+				that.permissions = this.currentRole.position[0].permission
+			} catch (e) {
+				that.permissions = []
+			}
+			tn.setStyle({
+				titleNView: st
+			});
+			const _this = this
 			uni.$on('app_popup', (usnerinfo) => {
-				that.loading = true
-				that.currentGroup = usnerinfo
-				var tn = plus.webview.currentWebview();
-				var st = tn.getStyle().titleNView;
-				console.log(st)
-				st.subtitleText = usnerinfo.name + "-" + usnerinfo.subname
-				tn.setStyle({
-					titleNView: st
-				});
-				setTimeout(() => {
-					that.loading = false
-				}, 1000)
+				_this.handlePosition(usnerinfo)
 			})
 		},
 		onReady() {
@@ -160,15 +182,96 @@
 		onNavigationBarButtonTap(e) {
 			// this.doShowPicker('show')
 			const subNVue = uni.getSubNVueById('app_popup')
+			let role = this.role
 			// 打开 nvue 子窗体  
 			subNVue.show('slide-in-bottom', 300, function() {
 				uni.$emit("app_popup_show", {
-					show: true
+					show: true,
+					data: role
 				})
 			});
 
 		},
 		methods: {
+			refreshRole() {
+				const send = request('position', 'getPositions', {}, {
+					showLoading: false
+				}).then(res => {
+					console.log("--------------", res)
+					this.$store.commit("user/setRole", res.data)
+				})
+			},
+			handlePosition(usnerinfo) {
+				const that = this
+				that.$store.commit("user/setCurrentRole", usnerinfo);
+				console.log(usnerinfo)
+				that.loading = true
+				that.currentGroup = usnerinfo
+				var tn = plus.webview.currentWebview();
+				var st = tn.getStyle().titleNView;
+				console.log(st)
+				try {
+					st.subtitleText = usnerinfo.department[0].name + "-"
+				} catch (e) {
+					st.subtitleText = "未知组织" + "-"
+				}
+				try {
+					st.subtitleText = st.subtitleText + usnerinfo.position[0].role_name
+				} catch (e) {
+					st.subtitleText = st.subtitleText + "未知职位"
+				}
+
+				try {
+					that.permissions = usnerinfo.position[0].permission
+				} catch (e) {
+					that.permissions = []
+				}
+				tn.setStyle({
+					titleNView: st
+				});
+				setTimeout(() => {
+					that.loading = false
+				}, 1000)
+			},
+			doit(list) {
+
+
+
+				console.log(list)
+				let normal_control_name = "机构管理"
+				let normal_permissions = ["setting", "data", "after_sell", "orders", "staff", "look_store", "in_store",
+					"deliver"
+				]
+				// let under_control_name = "下属机构管理"
+				// let under_permissions = ["under_data", "under_feedback"]
+				let dat = [{
+						title: normal_control_name,
+						data: []
+					}
+					// ,
+					// {
+					// 	title: under_control_name,
+					// 	data: []
+					// },
+				]
+				// let flag = false
+				list.map(a => {
+					if (normal_permissions.indexOf(a.permission) != -1) {
+						dat[0].data.push(a)
+					}
+					// else if (under_permissions.indexOf(a.permission) != -1) {
+					// 	dat[1].data.push(a)
+					// 	flag = true
+					// }
+				})
+				console.log(list)
+				// if (!flag) {
+				// 	dat.splice(1, 1)
+				// }
+
+				console.log(dat)
+				return dat
+			},
 			onClick(item, index) {
 				console.log(item, index)
 				uni.navigateTo({
@@ -190,6 +293,24 @@
 
 				}
 
+			},
+			getAvatar(item) {
+				console.log(item)
+				if (item.department && item.department[0] && item.department[0].name) {
+					let level = item.department[0].level
+					switch (level) {
+						case 0:
+							return 'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/%E9%9B%86%E6%95%A3.png?sign=0341ce73bfb2e68805db4f4685f9882c&t=1652877814'
+						case 1:
+							return 'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/%E4%B8%AD%E8%BD%AC.png?sign=8441b92810a5197dc65cb836add9fbe2&t=1652878088'
+						case 2:
+							return 'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/13%E6%9C%AB%E7%AB%AF%E7%BD%91%E7%82%B9.png?sign=947d543cad9988beafa1d277b9817975&t=1652878096'
+						default:
+							return 'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/%E5%BA%97%E9%93%BA.png?sign=77482becb174a212ac22a97928158836&t=1652878106'
+					}
+				} else {
+					return 'https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/app/%E5%BA%97%E9%93%BA.png?sign=77482becb174a212ac22a97928158836&t=1652878106'
+				}
 			},
 			closePicker: function(e) {
 				this.doShowPicker('hide')

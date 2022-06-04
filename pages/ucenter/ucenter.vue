@@ -889,7 +889,7 @@
 				.sub_title {
 					font-size: 24rpx;
 					color: #999;
-					margin-top: 20rpx
+					margin-top: 8rpx
 				}
 			}
 		}

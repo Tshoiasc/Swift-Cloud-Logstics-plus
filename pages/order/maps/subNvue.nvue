@@ -1,0 +1,25 @@
+<template>
+	<view>
+		<view class="image-box">
+
+		</view>
+		<image
+			src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/yj2.png?sign=ec3d921324c74f84293d5e108a0a3644&t=1649815688"
+			mode="heightFix" style="height: 72rpx;"></image>
+	</view>
+</template>
+
+<script>
+	export default {
+
+	}
+</script>
+
+<style>
+	.image-box {
+		height: 96rpx;
+		width: 144rpx;
+		background-color: #6293ff;
+		border-radius: 32rpx;
+	}
+</style>

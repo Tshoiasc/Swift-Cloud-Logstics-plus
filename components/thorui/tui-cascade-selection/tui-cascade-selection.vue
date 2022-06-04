@@ -25,8 +25,11 @@
 						@tap="change(index, subIndex, subItem)">
 						<icon type="success_no_circle" v-if="item.index === subIndex" :color="checkMarkColor"
 							:size="checkMarkSize" class="tui-icon-success"></icon>
-						<image :src="subItem.src" v-if="subItem.src" class="tui-cell-img"
-							:style="{ width: imgWidth, height: imgHeight, borderRadius: radius }"></image>
+
+						<!-- 						<image :src="subItem.src" v-if="subItem.src" class="tui-cell-img"
+							:style="{ width: imgWidth, height: imgHeight, borderRadius: radius }"></image> -->
+						<u-avatar :text="subItem.text.slice(0,1)" :fontSize="textSize/2" randomBgColor :size="imgWidth"
+							:style="{ width: imgWidth, height: imgHeight, borderRadius: radius }"></u-avatar>
 						<view class="tui-cell-title"
 							:class="{ 'tui-font-bold': item.index === subIndex && textBold, 'tui-flex-shrink': nowrap }"
 							:style="{ color: item.index === subIndex ? textActiveColor : textColor, fontSize: textSize + 'rpx' }">
@@ -275,7 +278,7 @@
 							if (j === 0) {
 								list = this.getItemList(-1)
 							} else {
-								list = this.getItemList(j - 1, subi,selectedArr)
+								list = this.getItemList(j - 1, subi, selectedArr)
 							}
 							subi = this.getDefaultIndex(list, item)
 							if (subi !== -1) {
@@ -546,6 +549,7 @@
 
 	.tui-cell-title {
 		word-break: break-all;
+		margin-left: 8rpx;
 	}
 
 	.tui-flex-shrink {

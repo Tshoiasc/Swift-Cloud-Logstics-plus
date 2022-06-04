@@ -1,8 +1,9 @@
 <template>
 	<view class="newspage">
 		<view style="z-index: 999;">
-			<u-loading-page :loading="!init_go"></u-loading-page>
+			<u-loading-page :loading="!init_go" image="/static/app-plus/other/loading.gif"></u-loading-page>
 		</view>
+
 		<view :id="pageId" class="page" :bounce="false" :style="'margin-top: '+systemInfo.statusBarHeight+'px;'">
 			<view class="tabs">
 				<view class="searchbar" style="height: 48px;display: flex;align-items: center;justify-content: center;">
@@ -70,7 +71,8 @@
 	export default {
 		computed: {
 			...mapGetters({
-				orders: "user/orders"
+				orders: "user/orders",
+				systemInfo: "user/systemInfo",
 			})
 		},
 		components: {
@@ -78,7 +80,6 @@
 		},
 		data() {
 			return {
-				systemInfo: {},
 				tabList: [{
 					id: "tab" + 1,
 					name: "我寄件",
@@ -206,7 +207,7 @@
 					} else {
 						// this.orders[key] = res.data
 						this.$store.commit("user/setOrder", {
-							type: "send",
+							type: key,
 							list: res.data
 						})
 						console.log(this.orders)

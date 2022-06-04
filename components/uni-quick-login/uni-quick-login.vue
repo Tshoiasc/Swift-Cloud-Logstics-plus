@@ -166,20 +166,21 @@
 				return '/' + pages[pages.length - n].route
 			},
 			to(path) {
-				console.log('比较', this.getRoute(1),this.getRoute(2), path)
-				if(this.getRoute(1) == path.split('?')[0] && this.getRoute(1) == '/pages/ucenter/login-page/index/index'){
+				console.log('比较', this.getRoute(1), this.getRoute(2), path)
+				if (this.getRoute(1) == path.split('?')[0] && this.getRoute(1) ==
+					'/pages/ucenter/login-page/index/index') {
 					//如果要被打开的页面已经打开，且这个页面是 /pages/ucenter/login-page/index/index 则把类型参数传给他
 					let type = path.split('?')[1].split('=')[1]
-					uni.$emit('setLoginType',type)
-				}else if(this.getRoute(2) == path) { // 如果上一个页面就是，马上要打开的页面，直接返回。防止重复开启
+					uni.$emit('setLoginType', type)
+				} else if (this.getRoute(2) == path) { // 如果上一个页面就是，马上要打开的页面，直接返回。防止重复开启
 					uni.navigateBack();
-				}else if(this.getRoute(1) != path) {
+				} else if (this.getRoute(1) != path) {
 					uni.navigateTo({
 						url: path,
 						animationType: 'slide-in-left'
 					})
-				}else{
-					console.log('出乎意料的情况,path：'+path);
+				} else {
+					console.log('出乎意料的情况,path：' + path);
 				}
 			},
 			login_before(type, navigateBack = true) {
@@ -190,31 +191,30 @@
 						icon: 'none'
 					});
 				}
-				uni.showLoading({mask: true})
 				if (type == 'univerify' && uni.getUniverifyManager) {
 					let univerifyManager = uni.getUniverifyManager()
 					console.log('是新版');
-					let onButtonsClickFn =	async res =>{
-						console.log('点击了第三方登录，provider：',res, res.provider,this.univerifyStyle.buttons.list);
+					let onButtonsClickFn = async res => {
+						console.log('点击了第三方登录，provider：', res, res.provider, this.univerifyStyle.buttons.list);
 						//同步一键登录弹出层隐私协议框是否打勾
 						let agree = (await uni.getCheckBoxState())[1].state
-						console.log('agree',agree);
+						console.log('agree', agree);
 						uni.$emit('setAgreementsAgree', agree)
 						let {
 							path
 						} = this.univerifyStyle.buttons.list[res.index]
-						console.log('path', path,this.getRoute(1));
+						console.log('path', path, this.getRoute(1));
 						if (path) {
 							this.to(path)
 							closeUniverify()
 						} else {
-							if(agree){
+							if (agree) {
 								closeUniverify()
 								setTimeout(() => {
 									console.log('login_before');
 									this.login_before(res.provider)
 								}, 500)
-							}else{
+							} else {
 								console.log(t('noAgree'));
 								uni.showToast({
 									title: t('noAgree'),
@@ -223,7 +223,8 @@
 							}
 						}
 					}
-					function closeUniverify(){
+
+					function closeUniverify() {
 						uni.hideLoading()
 						univerifyManager.close()
 						// 取消订阅自定义按钮点击事件
@@ -234,7 +235,7 @@
 					// 调用一键登录弹框
 					return univerifyManager.login({
 						"univerifyStyle": this.univerifyStyle,
-						success:res=> {
+						success: res => {
 							console.log('login success', res)
 							this.login(res.authResult, 'univerify')
 						},
@@ -244,13 +245,18 @@
 								icon: 'none'
 							});
 						},
-						complete(e){
+						complete(e) {
 							uni.hideLoading()
 							// 取消订阅自定义按钮点击事件
 							univerifyManager.offButtonsClick(onButtonsClickFn)
 						}
 					})
+				} else {
+					uni.showLoading({
+						mask: true
+					})
 				}
+
 				uni.login({
 					"provider": type,
 					"onlyAuthorize": true, //请勿直接使用前端获取的unionid或openid直接用于登录，前端的数据都是不可靠的
@@ -272,7 +278,7 @@
 					fail: async (err) => {
 						console.log(err);
 						// 以下代码为兼容旧版（HBuilderX3.2.13之前）HBuilderX3.2.13以上版本可直接删除
-						if (type == 'univerify'&& !uni.getUniverifyManager) {
+						if (type == 'univerify' && !uni.getUniverifyManager) {
 							if (err.metadata && err.metadata.error_data) {
 								uni.showToast({
 									title: t('oneClickLogin') + ":" + err.metadata.error_data,
@@ -354,8 +360,8 @@
 								return this.$refs.userProfile.open(result.uid)
 							}
 							// #endif
-							if (result.type == "register") {  
-								result.userInfo._id = result.uid  
+							if (result.type == "register") {
+								result.userInfo._id = result.uid
 							}
 							this.setUserInfo(result.userInfo)
 							loginSuccess(result)

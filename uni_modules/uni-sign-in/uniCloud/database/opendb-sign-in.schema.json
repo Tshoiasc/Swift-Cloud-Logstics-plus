@@ -12,29 +12,29 @@
 		"_id": {
 			"description": "ID，系统自动生成"
 		},
-		"user_id":{
-			"forceDefaultValue":{
-				"$env":"uid"
+		"user_id": {
+			"forceDefaultValue": {
+				"$env": "uid"
 			}
 		},
-		"date":{
-			"bsonType":"timestamp",
-			"description":"签到的日期时间戳",
-			"permission":{
-				"write":false
+		"date": {
+			"bsonType": "timestamp",
+			"description": "签到的日期时间戳",
+			"permission": {
+				"write": false
 			}
 		},
-		"create_date":{
-			"bsonType":"timestamp",
-			"description":"签到的时间戳",
-			"forceDefaultValue":{
-				"$env":"now"
+		"create_date": {
+			"bsonType": "timestamp",
+			"description": "签到的时间戳",
+			"forceDefaultValue": {
+				"$env": "now"
 			}
 		},
-		"ip":{
-			"bsonType":"string",
-			"forceDefaultValue":{
-				"$env":"clientIP"
+		"ip": {
+			"bsonType": "string",
+			"forceDefaultValue": {
+				"$env": "clientIP"
 			}
 		}
 	}

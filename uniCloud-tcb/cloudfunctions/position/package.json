@@ -1,0 +1,8 @@
+{
+  "name": "position",
+  "dependencies": {
+    "uni-id": "file:../../../uni_modules/uni-id/uniCloud/cloudfunctions/common/uni-id",
+    "uni-config-center": "file:../../../uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center"
+  },
+  "extensions": {}
+}

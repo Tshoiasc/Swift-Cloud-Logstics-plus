@@ -1,0 +1,208 @@
+<template>
+	<uni-list>
+		<uni-list-item :title="item._id" note="" v-for="item in list">
+
+			<template v-slot:body>
+				<view class="card">
+					<view class="">
+						<view class="title flex">
+							<text class="address">
+								{{item.send.area.address_components.city + " " +item.send.area.address_components.district}}
+							</text>
+							<image class="arrow" src="../../../../static/app-plus/other/right-arrow.png"
+								mode="widthFix">
+							</image>
+							<text class="address">
+								{{item.receive.area.address_components.city + " " +item.receive.area.address_components.district }}
+							</text>
+						</view>
+						<view class="flex" style="margin-top: 8rpx;">
+							<u-tag :text="item.title" plain shape="circle" type="primary" size="mini"></u-tag>
+						</view>
+						<view class="infos" style="margin-top: 8rpx;">
+
+							<view class="info__item">
+								<text class="info_text">收货地址：{{item.receive.address}}</text>
+							</view>
+							<view class="info__item">
+								<view style="display: flex;flex-direction: row;align-items: center;"><text
+										class="info_text">联系人：{{item.receive.name.slice(0,1)}}</text><text
+										v-for="index of item.receive.name.length - 1" style="info_text">*</text></view>
+							</view>
+							<view class="info__item" style="display: flex; align-items:center;flex-direction:row">
+								<text class="info_text">联系方式：</text>
+								<text class="info_text" style="color: #6ba2dd;"
+									@click="phone(item.receive.phone)">{{item.receive.phone}}</text>
+							</view>
+						</view>
+						<view style="position: absolute;right: 12rpx;top: 76rpx;" @click="sign(item)"	v-if="item.progress &&item.progress.length&& item.progress[item.progress.length - 1].type && item.progress[item.progress.length - 1].type == 'delivery'">
+							<uni-icons type="compose" size="32" color="#999"
+							>
+							</uni-icons>
+							<text style="color: #999;font-size:28rpx;margin-top:-8rpx">签收</text>
+						</view>
+
+					</view>
+
+					<view class="bottom-line flex"
+						style="position: absolute;bottom: 8rpx;left: 0;right: 0;height: 48rpx;display: flex;flex-direction: row;align-items: center;padding-top:12rpx;padding-bottom:6rpx;border-top: 1rpx solid #eee;">
+						<view class=""
+							style="height: 42rpx;display: flex;flex-direction: row;align-items: center;padding-left: 12rpx;">
+							<text style="font-size: 22rpx;color: #999;">单号：{{item._id}}</text>
+						</view>
+
+						<view class="right">
+							<tui-button
+								@click="onClickItem(item,item.progress &&item.progress.length&& item.progress[item.progress.length - 1].type && item.progress[item.progress.length - 1].type == 'delivery' ? 'undelivery' : 'delivery')"
+								:size="24" height="42rpx" width="116rpx"
+								:type="`${item.progress &&item.progress.length&& item.progress[item.progress.length - 1].type && item.progress[item.progress.length - 1].type == 'delivery' ? 'danger' : 'primary'}`">
+								<text
+									style="color: white;font-size: 20rpx;">{{item.progress &&item.progress.length&& item.progress[item.progress.length - 1].type && item.progress[item.progress.length - 1].type == 'delivery' ? '取消派件' : '点击派件'}}</text>
+							</tui-button>
+						</view>
+					</view>
+				</view>
+			</template>
+		</uni-list-item>
+	</uni-list>
+</template>
+
+<script>
+	import {
+		mapActions,
+		mapState,
+		mapGetters,
+		mapMutations
+	} from 'vuex';
+	import {
+		request
+	} from '@/common/request'
+	export default {
+		computed: {
+			...mapGetters({
+				userInfo: 'user/info',
+				hasLogin: 'user/hasLogin',
+				systemInfo: 'user/systemInfo',
+				role: "user/role",
+				currentRole: "user/currentRole"
+			})
+		},
+		data() {
+			return {
+				list: []
+			};
+		},
+		async onLoad() {
+			await this.getData()
+		},
+		async onNavigationBarButtonTap() {
+			//全部派送
+			const _this = this
+			const res = await request('orders', 'staffHandle', {
+				currentRole: _this.currentRole,
+				type: "delivery",
+				cls: "all"
+			});
+			await this.getData(true)
+		},
+		methods: {
+			sign(item) {
+				const _this = this
+				const eventChannel = this.$scope.eventChannel;
+				console.log(item)
+				uni.navigateTo({
+					url: "../signature/signature?_id=" + item._id,
+					events: {
+						// 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+						signature: async function(data) {
+							_this.getData()
+							// console.log(data)
+						}
+					},
+				})
+			},
+			onSign(data) {
+				console.log(data)
+			},
+			async getData(flag = true) {
+				const _this = this
+				console.log(this.currentRole)
+				const res = await request('orders', 'staffListOrdersToDeliver', {
+					currentRole: _this.currentRole,
+					page: 20,
+					current: 0
+				}, {
+					showLoading: flag
+				});
+				this.list = res.data.list
+			},
+			async onClickItem(item, deliver) {
+				const _this = this
+				if (deliver == 'undelivery') {
+					let confirm = await uni.showModal({
+						content: "是否取消"
+					})
+					console.log(confirm)
+					if (!confirm[1].confirm) return;
+				}
+				const res = await request('orders', 'staffHandle', {
+					currentRole: _this.currentRole,
+					_id: item._id,
+					type: "delivery",
+					close: deliver == 'undelivery'
+				});
+				await this.getData(true)
+			},
+			phone(number) {
+				plus.device.dial(number, true);
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.flex {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		position: relative;
+
+		.right {
+			position: absolute;
+			right: 24rpx;
+		}
+	}
+
+	.info_text {
+		font-size: 28rpx;
+		color: #555;
+	}
+
+	.info__item {
+		margin-top: 4rpx;
+	}
+
+	.card {
+		width: 702rpx;
+		padding: 24rpx;
+		height: 345rpx;
+		background-color: white;
+		border-radius: 24rpx;
+		box-shadow: 4rpx 5rpx 4rpx #fafafa;
+		border: 1rpx solid #eee;
+
+		.arrow {
+			width: 48rpx;
+			margin: 0 12rpx;
+			margin-top: -4rpx;
+		}
+
+		.title {
+			.address {
+				font-size: 32rpx;
+				font-weight: bold;
+			}
+
+		}
+	}
+</style>

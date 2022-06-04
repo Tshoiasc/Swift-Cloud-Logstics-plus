@@ -331,6 +331,7 @@ exports.main = async (event, context) => {
 			}
 
 			res.needCaptcha = needCaptcha;
+			console.log(res)
 			break;
 		case 'loginByWeixin':
 			let loginRes = await uniID.loginByWeixin(params);
@@ -420,11 +421,11 @@ exports.main = async (event, context) => {
 			break;
 		case 'sendSmsCode':
 			/* -开始- 测试期间，为节约资源。统一虚拟短信验证码为： 123456；开启以下代码块即可  */
-			return uniID.setVerifyCode({
-				mobile: params.mobile,
-				code: '123456',
-				type: params.type
-			})
+			// return uniID.setVerifyCode({
+			// 	mobile: params.mobile,
+			// 	code: '14774',
+			// 	type: params.type
+			// })
 			/* -结束- */
 
 			// 简单限制一下客户端调用频率
@@ -438,7 +439,7 @@ exports.main = async (event, context) => {
 					msg: '请求过于频繁'
 				}
 			}
-			const templateId = '11753' // 替换为自己申请的模板id
+			const templateId = '14774' // 替换为自己申请的模板id
 			if (!templateId) {
 				return {
 					code: 500,

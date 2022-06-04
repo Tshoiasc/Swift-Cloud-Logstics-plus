@@ -9,21 +9,23 @@
 					<text class="total">本轮已签到{{signInRes.days.length}}天</text>
 					<text class="scores">当前积分：{{signInRes.score}}</text>
 				</view>
+
 				<view>
 					<view class="days-box">
 						<view class="days" v-for="(item,index) in weekdays" :key="index">
 							<uni-icons v-if="signInRes.days.includes(item-1)" class="icon active" color="#FFFFFF"
-								type="checkmarkempty"></uni-icons>
+								type="checkmarkempty" :size="12"></uni-icons>
 							<template v-else>
-								<uni-icons v-if="item<signInRes.n" class="icon active" color="#FFFFFF"
+								<uni-icons v-if="item<signInRes.n" class="icon active" color="#FFFFFF" :size="12"
 									type="closeempty"></uni-icons>
-								<uni-icons v-else class="icon" type="checkmarkempty" color="#FFFFFF"></uni-icons>
+								<uni-icons v-else class="icon" type="checkmarkempty" color="#FFFFFF" :size="12">
+								</uni-icons>
 							</template>
 							<template v-if="signInRes.days.includes(item-1)||item>signInRes.n">
-								<text class="day" :class="{grey:item>signInRes.n}">第{{item}}天</text>
+								<text class="day" :class="{grey:item>signInRes.n}"
+									style="font-size: 20rpx;">第{{item}}天</text>
 							</template>
-
-							<text v-else class="day">缺卡</text>
+							<text v-else class="day" style="font-size: 20rpx;">缺卡</text>
 						</view>
 					</view>
 					<view class="tip-box">
@@ -146,16 +148,19 @@
 				}
 			},
 			//普通点击签到
-			async open() {
-				uni.showLoading({
-					mask: true
-				});
+			async open(func, noload) {
+				if (!noload) {
+					uni.showLoading({
+						mask: true
+					});
+				}
+
 				try {
 					let res = await this.getSignedInInfo();
 					if (res && res.length == 0) {
 						let res = await signInTable.add({});
 						console.log(res);
-						uni.hideLoading()
+						if (!noload) uni.hideLoading()
 						this.signInRes = res.result
 						this.$refs.popup.open()
 						if (this.signInRes.days.length == 7) {
@@ -172,10 +177,20 @@
 							})
 						}
 					}
+					if (func) {
+						func(true)
+					}
 				} catch (e) {
-					uni.hideLoading()
+					if (!noload)
+						uni.hideLoading()
 					console.error(e)
+					if (func) {
+						func(e)
+					}
+				} finally {
+
 				}
+
 			},
 			closeMe(e) {
 				this.$refs.popup.close()
@@ -227,7 +242,7 @@
 
 	.total {
 		background-color: #FFFFFF;
-		color: #ed5200;
+		color: #2e62fc;
 		text-align: center;
 		border-radius: 100px;
 		font-size: 30rpx;
@@ -249,7 +264,7 @@
 		font-size: 19rpx;
 		justify-content: center;
 		align-items: center;
-		color: #f8692c;
+		color: #2e62fc;
 	}
 
 	.grey {
@@ -257,17 +272,17 @@
 	}
 
 	.days-box .icon {
-		background-color: #feefeb;
+		background-color: #dfeaff;
 		border-radius: 100px;
-		height: 50rpx;
-		line-height: 50rpx;
+		height: 36rpx;
+		line-height: 36rpx;
 		text-align: center;
-		width: 50rpx;
+		width: 36rpx;
 		margin-bottom: 6rpx;
 	}
 
 	.days-box .icon.active {
-		background-image: linear-gradient(to top, #FF9002, #FF5100);
+		background-image: linear-gradient(to top, #0a8cfe, #1a5ce5);
 		background-color: #ffff7f;
 	}
 

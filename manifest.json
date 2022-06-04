@@ -1,9 +1,9 @@
 {
-    "name" : "express_nfc",
+    "name" : "云极速递+",
     "appid" : "__UNI__F70C244",
     "description" : "基于RFID实现物流管理的一体化解决方案",
-    "versionName" : "1.0.2",
-    "versionCode" : 102,
+    "versionName" : "1.0.7",
+    "versionCode" : 107,
     "transformPx" : false,
     "app-plus" : {
         "safearea" : {
@@ -48,9 +48,9 @@
         "usingComponents" : true,
         "nvueStyleCompiler" : "uni-app",
         "splashscreen" : {
-            "alwaysShowBeforeRender" : true,
-            "waiting" : true,
-            "autoclose" : true,
+            "alwaysShowBeforeRender" : false,
+            "waiting" : false,
+            "autoclose" : false,
             "delay" : 0
         },
         "modules" : {
@@ -62,7 +62,8 @@
             "Webview-x5" : {},
             "VideoPlayer" : {},
             "Maps" : {},
-            "OAuth" : {}
+            "OAuth" : {},
+            "Share" : {}
         },
         "distribute" : {
             "android" : {
@@ -74,12 +75,14 @@
                     "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.AUTHENTICATE_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
                     "<uses-permission android:name=\"android.permission.CAMERA\"/>",
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-permission android:name=\"android.permission.INTERNET\"/>",
                     "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_PHONE_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
                     "<uses-permission android:name=\"android.permission.NFC\"/>",
                     "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
@@ -100,18 +103,16 @@
                 },
                 "privacyDescription" : {
                     "NFCReaderUsageDescription" : "申请使用NFC功能",
-                    "NSUserTrackingUsageDescription" : "申请跟踪功能"
+                    "NSUserTrackingUsageDescription" : "申请跟踪功能",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription" : "请求访问你的位置"
                 }
             },
             "sdkConfigs" : {
-                "oauth" : {},
-                "ad" : {},
-                "share" : {
-                    "weixin" : {
-                        "appid" : "",
-                        "UniversalLinks" : ""
-                    }
+                "oauth" : {
+                    "univerify" : {}
                 },
+                "ad" : {},
+                "share" : {},
                 "geolocation" : {
                     "amap" : {
                         "__platform__" : [ "ios", "android" ],
@@ -172,13 +173,18 @@
                 //"autoclose" : true,
                 "autoclose" : false,
                 "delay" : 0,
-                "iosStyle" : "common",
+                "iosStyle" : "default",
                 "androidStyle" : "default",
                 "useOriginalMsgbox" : true,
                 "android" : {
                     "hdpi" : "/Users/tshoiasc/Downloads/云极速递480762.png",
                     "xhdpi" : "/Users/tshoiasc/Downloads/云极速递480762 (1).png",
                     "xxhdpi" : "/Users/tshoiasc/Downloads/dclogo.png"
+                },
+                "ios" : {
+                    "iphone" : {
+                        "iphonex" : "/Users/tshoiasc/云极速递480762 (1).png"
+                    }
                 }
             }
         },
@@ -187,44 +193,16 @@
             "enable" : true
         },
         "nativePlugins" : {
-            "Am-NFCReaderIDUniPlugin" : {
-                "__plugin_info__" : {
-                    "name" : "NFCReaderIDUniPlugin - [试用版，仅用于自定义调试基座]",
-                    "description" : "iOS版，读取NFC芯片ID的插件",
-                    "platforms" : "iOS",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=7401",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
-                    "isCloud" : true,
-                    "bought" : 0,
-                    "pid" : "7401",
-                    "parameters" : {}
-                }
-            },
-            "GLLNFCUniPlugin-Helper" : {
-                "__plugin_info__" : {
-                    "name" : "GLLNFCUniPlugin - [试用版，仅用于自定义调试基座]",
-                    "description" : "用于iOS NFC标签数据交互",
-                    "platforms" : "iOS",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=4666",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
-                    "isCloud" : true,
-                    "bought" : 0,
-                    "pid" : "4666",
-                    "parameters" : {}
-                }
-            },
             "yzy-YzyNfcTagRead" : {
                 "__plugin_info__" : {
-                    "name" : "NFCTagReader - [试用版，仅用于自定义调试基座]",
+                    "name" : "NFCTagReader",
                     "description" : "使用iOS原生的nfctag标签读取",
                     "platforms" : "iOS",
                     "url" : "https://ext.dcloud.net.cn/plugin?id=3545",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
+                    "android_package_name" : "indi.tshoiasc.cloud",
+                    "ios_bundle_id" : "Tsingshu-Technology.yunjisudi",
                     "isCloud" : true,
-                    "bought" : 0,
+                    "bought" : 1,
                     "pid" : "3545",
                     "parameters" : {}
                 }
@@ -259,9 +237,6 @@
     },
     "mp-toutiao" : {
         "usingComponents" : true
-    },
-    "uniStatistics" : {
-        "enable" : false
     },
     "h5" : {
         "template" : "",

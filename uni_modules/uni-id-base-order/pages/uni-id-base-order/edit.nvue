@@ -1,0 +1,217 @@
+<template>
+  <view class="uni-container">
+    <uni-forms ref="form" :value="formData" validate-trigger="submit" err-show-type="toast">
+      <uni-forms-item name="create_time" label="">
+        <uni-datetime-picker return-type="timestamp" v-model="formData.create_time"></uni-datetime-picker>
+      </uni-forms-item>
+      <uni-forms-item name="info" label="">
+        <uni-easyinput placeholder="自定义的订单拓展信息，如商品信息、会员卡种类信息等" v-model="formData.info"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="is_refund" label="">
+        <switch @change="binddata('is_refund', $event.detail.value)" :checked="formData.is_refund"></switch>
+      </uni-forms-item>
+      <uni-forms-item name="paid_time" label="">
+        <uni-datetime-picker return-type="timestamp" v-model="formData.paid_time"></uni-datetime-picker>
+      </uni-forms-item>
+      <uni-forms-item name="pay_type" label="">
+        <uni-easyinput placeholder="支付渠道，wxpay | alipay" v-model="formData.pay_type"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="platform" label="">
+        <undefined v-model="formData.platform"></undefined>
+      </uni-forms-item>
+      <uni-forms-item name="refund_amount" label="">
+        <uni-easyinput placeholder="退款金额（非退款订单表示已退款总金额，退款订单表示该笔退款的退款金额），单位：分" type="number" v-model="formData.refund_amount"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="refund_count" label="">
+        <uni-easyinput placeholder="总退款笔数（非退款订单有值）" type="number" v-model="formData.refund_count"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="refund_desc" label="">
+        <undefined v-model="formData.refund_desc"></undefined>
+      </uni-forms-item>
+      <uni-forms-item name="refund_time" label="">
+        <uni-datetime-picker return-type="timestamp" v-model="formData.refund_time"></uni-datetime-picker>
+      </uni-forms-item>
+      <uni-forms-item name="status" label="">
+        <uni-easyinput placeholder="订单状态，1：待付款，2：已付款，3：退款审核中，4：退款中，5：已退款，-1已取消付款/退款，-2：退款拒绝，-3：退款失败" type="number" v-model="formData.status"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="title" label="">
+        <uni-easyinput placeholder="商品标题" v-model="formData.title"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="total_fee" label="">
+        <uni-easyinput placeholder="订单总金额，单位：分。" type="number" v-model="formData.total_fee"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="transaction_id" label="">
+        <undefined v-model="formData.transaction_id"></undefined>
+      </uni-forms-item>
+      <uni-forms-item name="type" label="">
+        <uni-easyinput placeholder="订单类型，如商品订单，会员订单，充值订单等" v-model="formData.type"></uni-easyinput>
+      </uni-forms-item>
+      <uni-forms-item name="update_time" label="">
+        <uni-datetime-picker return-type="timestamp" v-model="formData.update_time"></uni-datetime-picker>
+      </uni-forms-item>
+      <view class="uni-button-group">
+        <button type="primary" class="uni-button" @click="submit">提交</button>
+      </view>
+    </uni-forms>
+  </view>
+</template>
+
+<script>
+  import { validator } from '../../js_sdk/validator/uni-id-base-order.js';
+
+  const db = uniCloud.database();
+  const dbCollectionName = 'uni-id-base-order';
+
+  function getValidator(fields) {
+    let result = {}
+    for (let key in validator) {
+      if (fields.indexOf(key) > -1) {
+        result[key] = validator[key]
+      }
+    }
+    return result
+  }
+
+  export default {
+    data() {
+      let formData = {
+        "create_time": null,
+        "info": "",
+        "is_refund": null,
+        "paid_time": null,
+        "pay_type": "",
+        "platform": null,
+        "refund_amount": null,
+        "refund_count": null,
+        "refund_desc": null,
+        "refund_time": null,
+        "status": null,
+        "title": "",
+        "total_fee": null,
+        "transaction_id": null,
+        "type": "",
+        "update_time": null
+      }
+      return {
+        formData,
+        formOptions: {},
+        rules: {
+          ...getValidator(Object.keys(formData))
+        }
+      }
+    },
+    onLoad(e) {
+      if (e.id) {
+        const id = e.id
+        this.formDataId = id
+        this.getDetail(id)
+      }
+    },
+    onReady() {
+      this.$refs.form.setRules(this.rules)
+    },
+    methods: {
+      /**
+       * 验证表单并提交
+       */
+      submit() {
+        uni.showLoading({
+          mask: true
+        })
+        this.$refs.form.validate().then((res) => {
+          return this.submitForm(res)
+        }).catch(() => {
+        }).finally(() => {
+          uni.hideLoading()
+        })
+      },
+
+      /**
+       * 提交表单
+       */
+      submitForm(value) {
+        // 使用 clientDB 提交数据
+        return db.collection(dbCollectionName).doc(this.formDataId).update(value).then((res) => {
+          uni.showToast({
+            icon: 'none',
+            title: '修改成功'
+          })
+          this.getOpenerEventChannel().emit('refreshData')
+          setTimeout(() => uni.navigateBack(), 500)
+        }).catch((err) => {
+          uni.showModal({
+            content: err.message || '请求服务失败',
+            showCancel: false
+          })
+        })
+      },
+
+      /**
+       * 获取表单数据
+       * @param {Object} id
+       */
+      getDetail(id) {
+        uni.showLoading({
+          mask: true
+        })
+        db.collection(dbCollectionName).doc(id).field("create_time,info,is_refund,paid_time,pay_type,platform,refund_amount,refund_count,refund_desc,refund_time,status,title,total_fee,transaction_id,type,update_time").get().then((res) => {
+          const data = res.result.data[0]
+          if (data) {
+            this.formData = data
+          }
+        }).catch((err) => {
+          uni.showModal({
+            content: err.message || '请求服务失败',
+            showCancel: false
+          })
+        }).finally(() => {
+          uni.hideLoading()
+        })
+      }
+    }
+  }
+</script>
+
+<style>
+  .uni-container {
+    padding: 15px;
+  }
+
+  .uni-input-border,
+  .uni-textarea-border {
+    width: 100%;
+    font-size: 14px;
+    color: #666;
+    border: 1px #e5e5e5 solid;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  .uni-input-border {
+    padding: 0 10px;
+    height: 35px;
+
+  }
+
+  .uni-textarea-border {
+    padding: 10px;
+    height: 80px;
+  }
+
+  .uni-button-group {
+    margin-top: 50px;
+    /* #ifndef APP-NVUE */
+    display: flex;
+    /* #endif */
+    justify-content: center;
+  }
+
+  .uni-button {
+    width: 184px;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    line-height: 1;
+    margin: 0;
+  }
+</style>

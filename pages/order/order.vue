@@ -22,23 +22,23 @@
 		</tui-navigation-bar>
 		<!-- #endif -->
 
-		<!-- #ifdef MP -->
+		<!-- #ifdef MP-WEIXIN -->
 		<view class="headers" :style="{ top : barParam.height + 'px'}">
 			<!-- #endif -->
 
-			<!-- #ifndef MP -->
-			<view class="headers" :style="{ paddingTop : systemInfo.safeArea.top + 'px'}">
+			<!-- #ifndef  MP-WEIXIN -->
+			<view class="headers" :style="{ top : systemInfo.statusBarHeight + 'px'}">
 				<!-- #endif -->
 				<tui-searchbar radius="16px" placeholder="搜索" height="32px" backgroundColor="#fff"
 					inputBgColor="#f7f7f7"></tui-searchbar>
-				<tui-tab :tabs="tabs" scroll :current="current_tab" color="#555" selectedColor="#333" bold
-					sliderBgColor="#ffd150" sliderHeight="4px"></tui-tab>
+				<tui-tab :tabs="tabs.map(a=>a.title)" scroll :current="current_tab" color="#555" selectedColor="#333"
+					bold sliderBgColor="#ffd150" sliderHeight="4px" @change="onChange" style="height: 80rpx;"></tui-tab>
 			</view>
 
-			<!-- #ifndef MP -->
-			<view class="container" :style="{ top : ( systemInfo.safeArea.top + 88) + 'px'}">
+			<!-- #ifndef  MP-WEIXIN -->
+			<view class="container" :style="{ top : ( systemInfo.statusBarHeight + 88) + 'px'}">
 				<!-- #endif -->
-				<!-- #ifdef MP -->
+				<!-- #ifdef  MP-WEIXIN -->
 				<view class="container" :style="{ top : (barParam.height + 88) + 'px'}">
 					<!-- #endif -->
 					<view>
@@ -49,56 +49,118 @@
 							v-bind:data-current="index" v-bind:id="item.id" v-on:click="change_tab">{{item}}</view>
 					</scroll-view> -->
 						<view class="hr"></view>
+						<swiper class="swiper" v-bind:current="current_tab" duration="300" @change="change_swiper"
+							circular :style="{height:(systemInfo.windowHeight  - topDis - 88) + 'px'}">
 
-						<swiper class="swiper" v-bind:current="current_tab" duration="300" @transition="move"
-							@change="change_swiper" circular
-							:style="{height:(systemInfo.windowHeight  - topDis - 88) + 'px'}">
-							<swiper-item v-for="item in tabs" 
+							<swiper-item v-for="(key,index) in tabs.map(a=>a.type)"
 								style="-webkit-overflow-scrolling:touch;overflow: scroll;height: 100%;background-color: #f7f7f7;">
-								<scroll-view refresher-enabled :scroll-y="true" style="height: 100%;background-color: #f7f7f7;">
-									<view class="card_list">
-										<view class="card_box" v-for="item in [1,2,3,4,5]">
-											<!-- <view class="card" v-for="(item, index) in tab_bar" :key="index">
-												<view class="title-box">
-													<image :src="item.img" mode="heightFix"></image>
-												</view>
-												<view class="tui-default">
-													您的快递已到达太原机场集散中心{{index}}
-												</view>
-												<view class="tui-sub-default">
-													运单号：0101010101515151515
-												</view>
-											</view> -->
-											<orderCard ></orderCard>
-										</view>
+								<scroll-view @refresherrestore="onRestoreRefresh" :refresher-triggered="refreshing"
+									refresher-enabled :scroll-y="true" @refresherrefresh="onRefresh(key)"
+									style="height: 100%;background-color: #f7f7f7;">
+									<view class="card_list" v-for="dat in rend.get(orders,key)"
+										v-if="rend.canShow(orders,key)">
+										<orderCard :staff="false" :data="dat" @toDetail="toDetail(dat)"></orderCard>
 
+										<!-- #ifdef MP-WEIXIN || H5 -->
+										<view class="" v-if="dat.length == rend.get(orders,key).length"
+											style="height: 88px;">
+
+										</view>
+										<!-- #endif -->
 
 									</view>
+
+
+									<tui-no-data
+										imgUrl="https://www.thorui.cn/h5/static/images/toast/img_noorder_3x.png" v-else>
+										暂无订单</tui-no-data>
+
 								</scroll-view>
 
 
 							</swiper-item>
 
 						</swiper>
+
 					</view>
 
 				</view>
+
 			</view>
 
 </template>
 
+<!-- #ifdef APP-PLUS || H5 -->
+<script module="rend" lang="renderjs">
+	export default {
+		methods: {
+			get(orders, key) {
+				if (!orders) return []
+				// console.log(orders)
+				if (orders[key] && orders[key].list) {
+					return orders[key].list
+				} else {
+					return []
+				}
+				console.log(orders[key], key)
+			},
+			canShow(orders, key) {
+				// console.log(orders[key].list.length)
+
+				if (orders[key] && orders[key].list && orders[key].list.length) {
+					return true;
+				}
+				return false
+			}
+		}
+	}
+</script>
+<!-- #endif -->
+<!-- #ifdef MP-WEIXIN -->
+<script module="rend" lang="wxs">
+	module.exports = {
+		get: function get(orders, key) {
+			if (orders[key]) {
+				return orders[key].list
+			} else {
+				return []
+			}
+			console.log(orders[key], key)
+		},
+		canShow: function(orders, key) {
+			// console.log(orders[key].list.length)
+			if (orders[key] && orders[key].list && orders[key].list.length) {
+				return true;
+			}
+			return false
+		}
+	}
+</script>
+<!-- #endif -->
+
 <script>
 	import {
-		mapActions,
-		mapState
+		// mapActions,
+		// mapState,
+		mapGetters,
+		// mapMutations
 	} from 'vuex';
 	import orderCard from './order_app/orderCard.nvue';
+	import {
+		request
+	} from '@/common/request'
 	export default {
+		computed: {
+			...mapGetters({
+				orders: "user/orders"
+			})
+		},
 		components: {
 			orderCard
 		},
 		data() {
 			return {
+				refreshing: false,
 				// 当前选中tab索引
 				current_tab: 0,
 				// 当前滚动条距离左边的位置
@@ -108,64 +170,16 @@
 				topDis: 0,
 				// 屏幕宽度
 				screen_width: 0,
-				tab_bar: [{
-						id: 'emotion',
-						tit: '情感'
-					},
-					{
-						id: 'news',
-						tit: '新闻'
-					},
-					{
-						id: 'diagrams',
-						tit: '八卦'
-					},
-					{
-						id: 'house',
-						tit: '楼市'
-					},
-					{
-						id: 'cars',
-						tit: '骑车'
-					},
-					{
-						id: 'healthy',
-						tit: '健康'
-					},
-					{
-						id: 'workplace',
-						tit: '职场'
-					},
-					{
-						id: 'all',
-						tit: '全部'
-					},
-					{
-						id: 'other',
-						tit: '其他'
-					},
-					{
-						id: 'music',
-						tit: '音乐'
-					},
-					{
-						id: 'movie',
-						tit: '影视'
-					},
-					{
-						id: 'sport',
-						tit: '运动'
-					},
-					{
-						id: 'country',
-						tit: '国家'
-					},
-					{
-						id: 'country',
-						tit: '国家'
-					}
-				],
-				tabs: ['我寄件', '我收件', '待支付', '售后'],
+				tabs: [{
+					title: '我寄件',
+					type: "send"
+				}, {
+					title: '我收件',
+					type: "recieve"
+				}, {
+					title: '待支付',
+					type: "pay"
+				}],
 				opacity: 1,
 				top: 0,
 				barParam: {},
@@ -250,6 +264,7 @@
 			uni.getSystemInfo({
 				success: (res) => {
 					this.screen_width = res.screenWidth
+					console.log(this.orders, this.tabs[0])
 				}
 			});
 			this.systemInfo = uni.getSystemInfoSync()
@@ -259,9 +274,37 @@
 
 		},
 		methods: {
-			move(e) {
+			toDetail: function(e) {
 				console.log(e)
+				uni.navigateTo({
+					url: "./maps/maps?_id=" + e._id
+				})
 			},
+			onRestoreRefresh() {
+				this.refreshing = false
+			},
+			async onRefresh(key) {
+				this.refreshing = true
+				const res = await request('orders', 'getOrders', {
+					current: 0,
+					page: 20,
+					type: key
+
+				}, {
+					showLoading: false
+				});
+				console.log(res)
+				this.$store.commit("user/setOrder", {
+					type: key,
+					list: res.data
+				})
+				uni.showToast({
+					title: "刷新成功",
+					icon: "none"
+				})
+				this.refreshing = false
+			},
+			move(e) {},
 			// 点击tabbar事件
 			change_tab(e) {
 				let index = e.target.dataset.current || e.currentTarget.dataset.current;
@@ -277,13 +320,18 @@
 				// 记录当前滑动的位置
 				this.current_tab = index
 				// 如果点击了第4个以后的,滚动条向右移动屏幕的宽度
-				this.scroll_into = this.tab_bar[index].id
+				// this.scroll_into = this.tab_bar[index].id
 			},
 			change() {
 
 			},
+			onChange(e) {
+				this.current_tab = e.index
+				console.log(e)
+			},
 			initNavigation(e) {
 				this.barParam = e
+				console.log(this.barParam)
 				// #ifdef MP
 				this.topDis = e.height
 				// #endif
@@ -359,7 +407,7 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 300rpx;
+		// height: 200rpx;
 	}
 
 	.bg {

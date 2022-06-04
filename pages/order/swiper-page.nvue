@@ -39,7 +39,7 @@
 			</cell>
 			<cell v-for="(item, index) in data" :key="item.id" :ref="'item'+index" v-else>
 				<view class="list-item">
-					<orderCard :staff="false" :data="item"></orderCard>
+					<orderCard :staff="false" :data="item" @toDetail="toDetail"></orderCard>
 				</view>
 			</cell>
 
@@ -86,7 +86,14 @@
 				});
 			}
 		},
+
 		methods: {
+			toDetail: function(e) {
+				console.log(e)
+				uni.navigateTo({
+					url: "./maps/maps?data=" + JSON.stringify(e)
+				})
+			},
 			onLoadMore: function(e) {
 				console.log(e)
 			},
@@ -153,7 +160,7 @@
 					// plus.navigator.setStatusBarStyle("light");
 					// this.theme = 'light'
 
-				}, 5000)
+				}, 200)
 			},
 			onPullingDown(e) {
 				let {

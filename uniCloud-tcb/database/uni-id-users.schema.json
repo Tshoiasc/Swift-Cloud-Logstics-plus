@@ -2,12 +2,13 @@
 	"bsonType": "object",
 	"required": ["username", "password"],
 	"permission": {
-		"read": "'read' in auth.permission",
-		"update":"doc._id == auth.uid && 'read' in auth.permission"
+		"read": "doc._id == auth.uid || 'read' in auth.permission",
+		"update": "doc._id == auth.uid"
 	},
 	"properties": {
 		"_id": {
-			"description": "存储文档 ID（用户 ID），系统自动生成"
+			"description": "存储文档 ID（用户 ID），系统自动生成",
+			"user_id": "auth.uid"
 		},
 		"username": {
 			"bsonType": "string",

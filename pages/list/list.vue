@@ -12,8 +12,7 @@
 
 
 
-				<view class="tui-rolling-search"
-					:style="{ marginRight:searchDis + 'px'}">
+				<view class="tui-rolling-search" :style="{ marginRight:searchDis + 'px'}">
 
 					<tui-icon name="search-2" :size="32" unit="rpx"></tui-icon>
 					<swiper vertical autoplay circular interval="8000" class="tui-swiper">
@@ -55,7 +54,7 @@
 
 		<view class="tui-product-category">
 			<view class="tui-category-item" v-for="(item, index) in category" :key="index" :data-key="item.name"
-				@tap="more">
+				@click="more(item)">
 				<view class="tui-image-box"
 					style="width: 100%; flex-grow:1;height:100%;display: flex;align-items: center;justify-content: center;">
 					<image
@@ -174,11 +173,13 @@
 		</view>
 		<view class="tui-product-box">
 			<view class="tui-title__img">
-				<image src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/img_home_update_3x.png?sign=fe085c091296bb901e1bb1d2d3840499&t=1649906621" mode="widthFix"></image>
+				<image
+					src="https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/img_home_update_3x.png?sign=fe085c091296bb901e1bb1d2d3840499&t=1649906621"
+					mode="widthFix"></image>
 			</view>
 			<view class="tui-product-list">
 				<view class="tui-product-container">
-<!-- 					<block v-for="(item, index) in productList" :key="index" v-if="(index + 1) % 2 != 0">
+					<!-- 					<block v-for="(item, index) in productList" :key="index" v-if="(index + 1) % 2 != 0">
 						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
 							<image :src="'/static/images/mall/product/' + item.img + '.jpg'" class="tui-pro-img"
 								mode="widthFix" />
@@ -195,7 +196,7 @@
 						</view>
 					</block> -->
 				</view>
-<!-- 				<view class="tui-product-container">
+				<!-- 				<view class="tui-product-container">
 					<block v-for="(item, index) in productList" :key="index" v-if="(index + 1) % 2 == 0">
 						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
 							<image :src="'/static/images/mall/product/' + item.img + '.jpg'" class="tui-pro-img"
@@ -227,7 +228,7 @@
 	export default {
 		data() {
 			return {
-				
+
 				current: 0,
 				tabbar: [{
 						icon: 'home',
@@ -257,7 +258,8 @@
 				],
 				category: [{
 						img: 'a-suyunjieyunkuaidiwuliu.png',
-						name: '速运服务'
+						name: '速运服务',
+						url: "./userPages/submitOrder/submitOrder"
 					},
 					{
 						img: 'zhuangmanhuowudexiaohuoche.png',
@@ -479,9 +481,9 @@
 				});
 			},
 			more: function(e) {
-				let key = e.currentTarget.dataset.key || '';
+				let key = e.url;
 				uni.navigateTo({
-					url: '../productList/productList?searchKey=' + key
+					url:  key
 				});
 			},
 			search: function() {
@@ -542,6 +544,7 @@
 	@import '/common/app.css';
 	/* #ifndef APP-NVUE */
 	@import '/components/uni/uParse/src/wxParse.css';
+
 	/* #endif */
 	page {
 		background-color: #f7f7f7;

@@ -1,0 +1,211 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": ["name"],
+	"permission": {
+		"read": "'readmember' in auth.permission",
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "族人ID，系统自动生成"
+		},
+		"name": {
+			"title": "姓名",
+			"bsonType": "string",
+			"trim": "both",
+			"minLength": 2
+		},
+		"idcard": {
+			"title": "身份证号",
+			"bsonType": "string",
+			"trim": "both",
+			"format": "idcard"
+		},
+		"parent_id": {
+			"description": "上级id",
+			"title": "父节点",
+			"bsonType": "string",
+			"parentKey": "_id"
+		},
+		"parent_relationship": {
+			"bsonType": "string",
+			"title": "与父节点的关系",
+			"enum": [{
+					"text": "子女",
+					"value": "parent"
+				},
+				{
+					"text": "配偶",
+					"value": "partner"
+				}
+			],
+			"description": "parent_id的关系可有多重，配偶也作为一种子关系",
+			"component": {
+				"name": "uni-data-checkbox",
+				"props": {
+					"disable": "true"
+				}
+			}
+		},
+		"parent_partner_id": {
+			"description": "母id。如果parent是女性，则本字段代表父亲",
+			"bsonType": "string"
+			// "parentKey": "_id"
+		},
+		"gender": {
+			"bsonType": "int",
+			"title": "性别",
+			"description": "用户性别：1 男性 2 女性",
+			"defaultValue": 1,
+			"enum": [{
+				"text": "男",
+				"value": 1
+			}, {
+				"text": "女",
+				"value": 2
+			}]
+		},
+		// "partner_id":{
+		// 	"bsonType":"string",
+		// 	"title": "配偶的族人id",
+		// 	"description":"partner_id和parent_id是并列的。族人该字段为空，族人的配偶的该字段指向族人。可有多个配偶指向族人id，代表多婚。但不支持一个配偶和多个族人结婚"
+		// },
+		"birthyear": {
+			"bsonType": "int",
+			"title": "出生年份"
+			// "minimum":1800,
+			// "maximum":2100
+		},
+		"dieyear": {
+			"bsonType": "int",
+			"title": "死亡年份"
+			// "minimum":1800,
+			// "maximum":2100
+		},
+		"birthlocation": {
+			"bsonType": "string",
+			"title": "出生地点",
+			"trim": "both"
+		},
+		"finallocation": {
+			"bsonType": "string",
+			"title": "最后地点",
+			"description": "未亡人填写现居住地",
+			"trim": "both"
+		},
+		"nation": {
+			"bsonType": "string",
+			"title": "民族",
+			"defaultValue": "汉族",
+			"trim": "both"
+		},
+		"policital_status": {
+			"bsonType": "string",
+			"title": "政治面貌",
+			"defaultValue": "群众",
+			"enum": [{
+				"text": "群众",
+				"value": "群众"
+			}, {
+				"text": "党员",
+				"value": "党员"
+			}]
+		},
+		"school": {
+			"bsonType": "string",
+			"title": "毕业学校",
+			"trim": "both"
+		},
+		"education": {
+			"bsonType": "string",
+			"title": "学历",
+			"enum": [{
+					"text": "博士后",
+					"value": "博士后"
+				},
+				{
+					"text": "博士",
+					"value": "博士"
+				},
+				{
+					"text": "硕士",
+					"value": "硕士"
+				},
+				{
+					"text": "本科",
+					"value": "本科"
+				},
+				{
+					"text": "大专",
+					"value": "大专"
+				},
+				{
+					"text": "高中",
+					"value": "高中"
+				},
+				{
+					"text": "中专",
+					"value": "中专"
+				},
+				{
+					"text": "初中",
+					"value": "初中"
+				},
+				{
+					"text": "小学",
+					"value": "小学"
+				},
+				{
+					"text": "无",
+					"value": "无"
+				}
+			]
+		},
+		"professional_title": {
+			"bsonType": "string",
+			"title": "职称",
+			"enum": ["无", "正高级", "副高级", "中级", "初级"]
+		},
+		"company": {
+			"bsonType": "string",
+			"title": "工作单位",
+			"trim": "both"
+		},
+		"worktitle": {
+			"bsonType": "string",
+			"title": "职务",
+			"trim": "both"
+		},
+		"resume": {
+			"bsonType": "string",
+			"title": "简历",
+			"trim": "both",
+			"componentForEdit": {
+				"name": "textarea"
+			}
+		},
+		"photo_person": {
+			"title": "个人照片",
+			"bsonType": "file",
+			"fileMediaType": "image",
+			"fileExtName": "jpg"
+		},
+		"photo_family": {
+			"title": "家庭照片",
+			"bsonType": "file",
+			"fileMediaType": "image",
+			"fileExtName": "jpg,png"
+		},
+		"comment": {
+			"bsonType": "string",
+			"title": "备注",
+			"trim": "both",
+			"componentForEdit": {
+				"name": "textarea"
+			}
+		}
+	}
+}

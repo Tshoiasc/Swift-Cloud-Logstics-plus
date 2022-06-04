@@ -8,7 +8,7 @@
 	</refresh>
 	<view>
 		<view>
-			<u-loading-page :loading="!load_logo" loading-mode="semicircle"></u-loading-page>
+			<u-loading-page :loading="!load_logo" image="/static/app-plus/other/loading.gif"></u-loading-page>
 		</view>
 		<view class="zw" ref="zw"></view>
 		<view class="container" style="height: 1000px;background-color: #f7f7f7;z-index: -99999;">
@@ -40,11 +40,11 @@
 										<!-- 										<cloud-image class="navbar__avatar" width="64rpx" height="64rpx"
 											mode="scaleToFill" v-if="userInfo.avatar_file&&userInfo.avatar_file.url"
 											:src="userInfo.avatar_file.url" style="border-radius:64rpx;"></cloud-image> -->
-										<image class="navbar__avatar" mode="scaleToFill"
-											style="border-radius: 64px;width: 64rpx;height: 64rpx;"
-											v-if="userInfo.avatar_file&&userInfo.avatar_file.url&&userInfo.avatar_file.tempUrl"
-											:src="userInfo.avatar_file.tempUrl.download_url">
-										</image>
+										<cloud-image class="navbar__avatar" mode="scaleToFill"
+											style="border-radius: 64px;width: 64rpx;height: 64rpx;" width="64rpx"
+											height="64rpx" v-if="userInfo.avatar_file&&userInfo.avatar_file.url"
+											:src="userInfo.avatar_file.url">
+										</cloud-image>
 									</view>
 								</view>
 							</swiper-item>
@@ -106,15 +106,14 @@
 							<view class="scroll-list__line" v-for="(item, index) in menuArr" :key="index">
 								<view class="scroll-list__line__item" v-for="(item1, index1) in item" :key="index1"
 									:class="[(index1 === item.length - 1) && 'scroll-list__line__item--no-margin-right']"
-									style="width: 104rpx;">
+									style="width: 116rpx;" @click="item1.event()">
 									<view class="image-box"
 										style="width: 82rpx;height:64rpx;align-items: center;justify-content: center;">
 										<image class="scroll-list__line__item__image" :src="menuBaseUrl + item1.icon"
 											mode="widthFix"
-											:style="{width : item1.size ? item1.size : '48rpx' , height : item1.size ? item1.size : '48rpx'}">
+											:style="{width : item1.size ? item1.size : '50rpx' , height : item1.size ? item1.size : '50rpx'}">
 										</image>
 									</view>
-
 									<text class="scroll-list__line__item__text"
 										style="color:#333;font-weight: 500;">{{ item1.name }}</text>
 								</view>
@@ -124,18 +123,19 @@
 				</view>
 				<view class="swiper">
 					<u-swiper :list="list1" @change="change" @click="click" height="172rpx" radius="16rpx"
-						:indicator="true" :indicatorMode="'line'"></u-swiper>
+						:circular="true" :indicator="true" :indicatorMode="'line'"></u-swiper>
 				</view>
 				<view class="express_card" v-if="orders.send && orders.send.count">
 					<view class="title-box">
 						<text class="title">
 							快递时刻
 						</text>
-						<text class="subTitle">2022/04/19 18:40</text>
+						<!-- <text class="subTitle">2022/04/19 18:40</text> -->
 					</view>
 
 
-					<orderCard :data="orders.send.list[0]"></orderCard>
+					<orderCard :data="orders.send.list[0]" @toDetail="toDetail(orders.send.list[0])">
+					</orderCard>
 				</view>
 			</view>
 
@@ -160,9 +160,10 @@
 	import {
 		request
 	} from '@/common/request'
+
 	export default {
 		components: {
-			orderCard,
+			orderCard
 		},
 		computed: {
 			...mapGetters({
@@ -172,6 +173,7 @@
 				orders: "user/orders"
 			})
 		},
+
 		data() {
 			return {
 				value: 6,
@@ -193,7 +195,20 @@
 					},
 					{
 						name: "扫码寄件",
-						icon: "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/head/%E6%89%AB%E6%8F%8F-%E5%A3%B9%E7%B1%B3%E6%BB%B4%E7%AD%94.png?sign=2c37c6b93d9bd051c6e1afc7aa033a06&t=1650136709"
+						icon: "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/head/%E6%89%AB%E6%8F%8F-%E5%A3%B9%E7%B1%B3%E6%BB%B4%E7%AD%94.png?sign=2c37c6b93d9bd051c6e1afc7aa033a06&t=1650136709",
+						handle: () => {
+							uni.scanCode({
+								success: (e) => {
+									uni.showToast({
+										title: e.result,
+										icon: "none"
+									})
+								},
+								fail: (e) => {
+
+								}
+							})
+						}
 					},
 					{
 						name: "会员中心",
@@ -201,103 +216,107 @@
 					},
 					{
 						name: "在线客服",
-						icon: "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/head/%E5%9C%A8%E7%BA%BF%E5%AE%A2%E6%9C%8D-%E5%A3%B9%E7%B1%B3%E6%BB%B4%E7%AD%94-01.png?sign=ae75be909602f613c50e5fc795a723bf&t=1650136739"
+						icon: "https://6e66-nfc-7g80xpae1553a28a-1307546242.tcb.qcloud.la/head/%E5%9C%A8%E7%BA%BF%E5%AE%A2%E6%9C%8D-%E5%A3%B9%E7%B1%B3%E6%BB%B4%E7%AD%94-01.png?sign=ae75be909602f613c50e5fc795a723bf&t=1650136739",
+						handle: () => {
+							plus.device.dial("13425160821", false);
+						}
 					}
 				],
 				scrollTop: 0,
 				keyword: "",
 				menuArr: [
 					[{
-							name: '订单查询',
-							icon: '查到件-壹米滴答.png',
-							size: "52rpx"
-						},
-						{
-							name: '搬家服务',
-							icon: '版本号2-壹米滴答-01.png'
-						}, {
-							name: '跨境寄送',
-							icon: '查网点-壹米滴答-01.png'
-						}, {
-							name: '大件寄送',
-							icon: '地址-壹米滴答-01.png',
-							size: "46rpx"
-						}, {
-							name: '同城跑腿',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '海运服务',
-							icon: '信息采集_壹米滴答.png'
-						}, {
-							name: '批量寄送',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '专属服务',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '合作洽谈',
-							icon: '密码-壹米滴答-01.png'
+						name: '订单查询',
+						icon: '查到件-壹米滴答.png',
+						size: "54rpx"
+					}, {
+						name: '站点查询',
+						icon: '专属网点-壹米滴答-01.png'
+					}, {
+						name: '常用地址',
+						icon: '收派范围查询-壹米滴答-01 (1).png',
+						event: () => {
+							uni.navigateTo({
+								url: "./userPages/offenAddress/offenAddress"
+							})
 						}
-					],
-					[{
-						name: '保密寄送',
-						icon: '地址-壹米滴答-01.png'
 					}, {
-						name: '宠物寄送',
-						icon: '密码-壹米滴答-01.png'
+						name: '保密配送',
+						icon: '密码-壹米滴答-01.png',
+						event: () => {
+							uni.navigateTo({
+								url: "./userPages/submitOrder/submitOrder?type=保密"
+							})
+						}
 					}, {
-						name: '寄贵重品',
-						icon: '信息采集_壹米滴答.png'
-					}, {
-						name: '寄挂号信',
-						icon: '密码-壹米滴答-01.png'
-					}, {
-						name: '加急专送',
-						icon: '密码-壹米滴答-01.png'
-					}, {
-						name: '客服反馈',
-						icon: '密码-壹米滴答-01.png'
-					}, {
-						name: '天猫国际',
-						icon: '查网点-壹米滴答-01.png'
-					}, {
-						name: '饿了么',
-						icon: '地址-壹米滴答-01.png'
-					}, {
-						name: '天猫超市',
-						icon: '密码-壹米滴答-01.png'
+						name: '大件寄送',
+						icon: '装车任务_壹米滴答.png',
+						size: "46rpx",
+						event: () => {
+							uni.navigateTo({
+								url: "./userPages/submitOrder/submitOrder?type=大件"
+							})
+						}
 					}],
 					[{
-							name: '速运服务',
-							icon: '查到件-壹米滴答.png',
-							size: "52rpx"
-						},
-						{
-							name: '搬家服务',
-							icon: '版本号2-壹米滴答-01.png'
-						}, {
-							name: '跨境寄送',
-							icon: '查网点-壹米滴答-01.png'
-						}, {
-							name: '大件寄送',
-							icon: '地址-壹米滴答-01.png'
-						}, {
-							name: '同城跑腿',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '海运服务',
-							icon: '信息采集_壹米滴答.png'
-						}, {
-							name: '批量寄送',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '专属服务',
-							icon: '密码-壹米滴答-01.png'
-						}, {
-							name: '合作洽谈',
-							icon: '密码-壹米滴答-01.png'
+						name: '寄挂号信',
+						icon: '信息采集_壹米滴答.png',
+						event: () => {
+							uni.navigateTo({
+								url: "./userPages/submitOrder/submitOrder?type=挂号信"
+							})
 						}
-					]
+					}, {
+						name: '寄贵重品',
+						icon: '钱袋-壹米滴答.png',
+						size: "52rpx",
+						event: () => {
+							uni.navigateTo({
+								url: "./userPages/submitOrder/submitOrder?type=贵重品"
+							})
+						}
+					}, {
+						name: '搬家服务',
+						icon: '卸车任务_壹米滴答.png'
+					}, {
+						name: '批量寄送',
+						icon: '库存管理-壹米滴答.png'
+					}, {
+						name: '同城跑腿',
+						icon: '创建配载单_壹米滴答.png'
+					}],
+					[{
+						name: '关于我们',
+						icon: '版本号2-壹米滴答-01.png',
+						event: () => uni.navigateTo({
+							url: "/pages/ucenter/about/about"
+						})
+					}, {
+						name: '使用帮助',
+						icon: '使用帮助_壹米滴答.png'
+					}, {
+						name: '一起分享',
+						icon: '分享-壹米滴答-01.png',
+						event: () => {
+							plus.share.sendWithSystem({
+								type: 'text',
+								content: '快来使用云极速递吧',
+								href: 'http://www.yunjisudi.com/'
+							}, (e) => {
+								console.log(e), (e) => {
+									console.log(e)
+								}
+							}, (e) => {
+								console.log(e)
+							})
+						}
+					}, {
+						name: '更多服务',
+						icon: '更多-壹米滴答.png'
+					}, {
+						name: '关于云极',
+						icon: '痕迹采集-壹米滴答-01.png'
+					}]
 				],
 				pullingDistance: 0,
 				navbarHeight: 88,
@@ -311,6 +330,18 @@
 			}
 		},
 		onShow() {
+			// if(this.systemInfo.platform != 'ios'){
+			// 	uni.setTabBarItem({
+			// 		index: 0,
+			// 		selectedIconPath: "/static/images/newTabbar/_home_gif.gif",
+			// 	})
+			// 	setTimeout(() => {
+			// 		uni.setTabBarItem({
+			// 			index: 0,
+			// 			selectedIconPath: "/static/images/newTabbar/_home_active.png",
+			// 		})
+			// 	}, 500)
+			// }
 			plus.navigator.setStatusBarStyle(this.theme)
 			setTimeout(() => {
 				console.log(this.$refs.refresh)
@@ -321,6 +352,7 @@
 				else dom.scrollToElement(this.$refs.refresh.ref, {})
 
 			}, 300)
+
 			console.log("orders", this.orders)
 			// if (this.hasLogin && !this.orders.send) {
 			// 	this.getData("send").then(res => {
@@ -407,15 +439,22 @@
 				}
 			},
 			logo_load() {
+				console.log("一家在")
 				this.logo_index = 1
 				this.load_logo = true;
 
 
 			},
 			onClickButton(item) {
-				uni.navigateTo({
-					url: item.url
-				})
+				if (item.url) {
+					uni.navigateTo({
+						url: item.url
+					})
+
+				} else if (item.handle) {
+					item.handle()
+				}
+
 			},
 			onrefresh() {
 				this.page_refreshing = true
@@ -445,6 +484,12 @@
 
 
 
+			},
+			toDetail: function(e) {
+				console.log(e)
+				uni.navigateTo({
+					url: "../order/maps/maps?data=" + JSON.stringify(e)
+				})
 			},
 			left() {
 				console.log('left');

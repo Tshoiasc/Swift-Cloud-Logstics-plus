@@ -101,6 +101,37 @@
 				"navigationBarTitleText": "搜索"
 			}
 		}, {
+			"path": "pages/order/maps/maps",
+			"style": {
+				"navigationBarTitleText": "物流详情",
+				"mp-weixin": {
+					"disableScroll": true
+				},
+				"app-plus": {
+					"bounce": "none"
+					// "subNVues": [{
+					// 	"id": "map-logo", // 唯一标识  
+					// 	"path": "pages/order/maps/subNvue", // 页面路径  
+					// 	"style": {
+					// 		"position": "absolute",
+					// 		"dock": "top",
+					// 		"top": "12px",
+					// 		"right": "0",
+					// 		"left": "24px",
+					// 		"background": "transparent",
+					// 		"mask": "none",
+					// 		"backButtonAutoControl": "none"
+					// 	}
+					// }]
+				},
+				"mp-alipay": {
+					"allowsBounceVertical": "NO"
+				},
+				"mp-baidu": {
+					"disableScroll": true
+				}
+			}
+		}, {
 			"path": "pages/list/detail",
 			"style": {
 				"app-plus": {
@@ -127,16 +158,16 @@
 		{
 			"path": "pages/ucenter/ucenter",
 			"style": {
-				"backgroundColor": "#f7f7f7",
+				"backgroundColor": "#ffffff",
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "black"
 					//#ifdef APP-PLUS
 					,
 				"app-plus": {
-					"background": "#f7f7f7",
+					"background": "#ffffff",
 					"scrollIndicator": "none"
 					// ,
-					
+
 					// "titleNView": {
 					// 	"type": "transparent",
 					// 	"titleText": "二十三",
@@ -180,7 +211,9 @@
 
 				}
 			}
-		}, {
+		},
+		// #ifdef APP-PLUS
+		{
 			"path": "pages/app/apps/pushInStore/pushInStore",
 			"style": {
 				"navigationBarTitleText": "入库管理",
@@ -206,7 +239,9 @@
 
 			}
 
-		}, {
+		},
+		// #endif
+		{
 			"path": "pages/uni-agree/uni-agree",
 			"style": {
 				"navigationStyle": "custom",
@@ -321,7 +356,7 @@
 							"text": "添加",
 							"fontSize": "16",
 							"color": "#555",
-							"width": "auto"
+							"width": "54"
 						}]
 					}
 				}
@@ -336,6 +371,91 @@
 
 		}
 
+		, {
+			"path": "uni_modules/uni-id-base-order/pages/uni-id-base-order/add",
+			"style": {
+				"navigationBarTitleText": "新增"
+			}
+		}, {
+			"path": "uni_modules/uni-id-base-order/pages/uni-id-base-order/edit",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		}, {
+			"path": "uni_modules/uni-id-base-order/pages/uni-id-base-order/list",
+			"style": {
+				"navigationBarTitleText": "列表"
+			}
+		}, {
+			"path": "uni_modules/uni-id-base-order/pages/uni-id-base-order/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
+		}, {
+			"path": "pages/list/userPages/offenAddress/edit/edit",
+			"style": {
+				"navigationBarTitleText": "新增联系人",
+				"enablePullDownRefresh": false
+			}
+
+		},
+		// #ifdef APP-PLUS
+		{
+			"path": "pages/app/apps/verifyExpress/verifyExpress",
+			"style": {
+				"navigationBarTitleText": "验视管理",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"subNVues": [{
+						"id": "sub_nfc", // 唯一标识  
+						"path": "pages/app/apps/pushInStore/sub_nfc", // 页面路径  
+						"type": "popup",
+						"style": {
+							"position": "absolute",
+							"dock": "bottom",
+							"top": "750rpx",
+							"bottom": "0",
+							"right": "8rpx",
+							"left": "8rpx",
+							"background": "transparent",
+							// "mask": "none",
+							"backButtonAutoControl": "none"
+						}
+					}]
+				}
+
+			}
+
+		},
+		// #endif
+		{
+			"path": "pages/app/apps/deliverExpress/deliverExpress",
+			"style": {
+				"navigationBarTitleText": "派送管理",
+				"enablePullDownRefresh": false,
+				"backgroundColor": "#f7f7f7",
+				"app-plus": {
+					"background": "#f7f7f7"
+					// "titleNView": {
+					// 	"buttons": [{
+					// 		"float": "right",
+					// 		"text": "全部派送",
+					// 		"fontSize": "13",
+					// 		"color": "#555",
+					// 		"width": "auto"
+					// 	}]
+					// }
+				}
+			}
+
+		}, {
+			"path": "pages/app/apps/signature/signature",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}
 	],
 	"easycom": {
 		"autoscan": true,
@@ -389,29 +509,32 @@
 
 		"list": [{
 				"pagePath": "pages/list/list",
-				"text": "首页",
-				"iconPath": "static/images/tabbar/home.png"
+				"text": "首页"
 					// #ifdef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/home-fill-app.png"
+				"selectedIconPath": "static/app-plus/newTabbar/_home_gif.gif",
+				"iconPath": "static/app-plus/newTabbar/_home.png"
 					// #endif
 					// #ifndef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/home-fill.png"
+				"selectedIconPath": "static/images/tabbar/home-fill.png",
+				"iconPath": "static/images/tabbar/home.png"
 				// #endif
 			},
 			{
 				"pagePath": "pages/order/order",
-				"text": "订单",
-				"iconPath": "static/images/tabbar/order-empty.png"
+				"text": "订单"
+					// "iconPath": "static/images/tabbar/order-empty.png"
 
 					// #ifdef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/order-fill-app.png"
+				"selectedIconPath": "static/app-plus/newTabbar/bell_gif.gif",
+				"iconPath": "static/app-plus/newTabbar/bell.png"
 					// #endif
 					// #ifndef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/order-fill.png"
+				"selectedIconPath": "static/images/tabbar/order-fill.png",
+				"iconPath": "static/images/tabbar/order-empty.png"
 				// #endif
 
 
@@ -420,22 +543,23 @@
 			// #ifdef APP-PLUS
 			{
 				"pagePath": "pages/app/app",
-				"text": "工作台",
-				"iconPath": "static/images/tabbar/app.png",
-				"selectedIconPath": "static/images/tabbar/app-fill-app.png"
+				"text": "办公",
+				"iconPath": "static/app-plus/newTabbar/chat.png",
+				"selectedIconPath": "static/app-plus/newTabbar/chat_gif.gif"
 			},
 			// #endif
 			{
 				"pagePath": "pages/ucenter/ucenter",
-				"text": "我",
-				"iconPath": "static/images/tabbar/user.png"
+				"text": "我"
 					// #ifdef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/user-fill-app.png"
+				"iconPath": "static/app-plus/newTabbar/my.png",
+				"selectedIconPath": "static/app-plus/newTabbar/my_gif.gif"
 					// #endif
 					// #ifndef APP-PLUS
 					,
-				"selectedIconPath": "static/images/tabbar/user-fill.png"
+				"selectedIconPath": "static/images/tabbar/user-fill.png",
+				"iconPath": "static/images/tabbar/user.png"
 				// #endif
 
 			}

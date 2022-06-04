@@ -4,13 +4,17 @@
     "configurations": [{
      	"app-plus" : 
      	{
-     		"launchtype" : "local"
+     		"launchtype" : "remote"
      	},
      	"default" : 
      	{
      		"launchtype" : "local"
      	},
      	"h5" : 
+     	{
+     		"launchtype" : "local"
+     	},
+     	"mp-weixin" : 
      	{
      		"launchtype" : "local"
      	},
